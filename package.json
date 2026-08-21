@@ -1,0 +1,31 @@
+{
+  "name": "scifi-mahjong-ui",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "deploy": "node scripts/deploy.mjs --target=all",
+    "deploy:frontend": "node scripts/deploy.mjs --target=frontend",
+    "deploy:backend": "node scripts/deploy.mjs --target=backend",
+    "cap:check": "cap doctor",
+    "android:sync": "cap sync android",
+    "android:open": "cap open android",
+    "ios:sync": "cap sync ios",
+    "ios:open": "cap open ios",
+    "performance:check": "node scripts/checkPerformance.js"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/ios": "^8.4.2",
+    "@capacitor/splash-screen": "^8.0.2"
+  }
+}

@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-verify/
+*.tar.gz
+
+# Android intermediate build files
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/build/
+android/.idea/
+android/*.iml
+android/app/*.iml
+
+# iOS build & user data
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/build/
+ios/App/DerivedData/
+
+# Logs & temp files
+*.log
+*.bak
+*.stat
+*.db
+*.dat
+*.bin
+*.config
+Backup/
+.runtime/
+.trash/
+.workbuddy/
+.agents/
+.codex/
+
+# OS specific
+.DS_Store
+Thumbs.db

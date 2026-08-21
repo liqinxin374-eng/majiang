@@ -1,0 +1,11 @@
+{
+  "serverHost": "www.xiguazi.online",
+  "serverOrigin": "https://www.xiguazi.online",
+  "deploySecret": "mahjong_deploy_secret_2026_xiguazi",
+  "sshUser": "ubuntu",
+  "sshPort": 22,
+  "sshKey": "",
+  "remoteWebDir": "/var/www/mahjong",
+  "remoteServerDir": "/opt/mahjong-server",
+  "serviceName": "mahjong-server"
+}

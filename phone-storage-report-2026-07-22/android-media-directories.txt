@@ -1,0 +1,7 @@
+﻿com.easy.abroad
+com.huawei.filemanager
+com.huawei.hwid
+com.huawei.wallet
+com.sdu.didi.psnger
+com.sh.cm.ogrid4ao
+com.szlanyou.nissaniov

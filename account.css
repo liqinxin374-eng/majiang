@@ -1,0 +1,425 @@
+/* ============================================================
+   账号系统样式（BUG-002 修复新增）
+   首页登录面板 / 顶栏账号信息 / 战绩与排行榜弹层 / 服务器地址设置
+   单独成文件，和 mobile-landscape.css 一样在主样式之后加载。
+   ============================================================ */
+
+.account-panel {
+    width: 100%;
+    max-width: 480px;
+    margin: 18px auto 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(0, 243, 255, 0.35);
+    border-radius: 12px;
+    background: rgba(4, 12, 28, 0.72);
+    box-shadow: inset 0 0 18px rgba(0, 243, 255, 0.12);
+    text-align: left;
+}
+
+.account-panel-title {
+    margin: 0 0 10px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #7ef9ff;
+}
+
+.account-hint {
+    margin: 0 0 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: rgba(226, 241, 247, 0.72);
+}
+
+.account-form {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.account-field {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(226, 241, 247, 0.9);
+}
+
+.account-field input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #e2f1f7;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.account-field input:focus {
+    outline: none;
+    border-color: #00f3ff;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+}
+
+.account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.account-btn {
+    flex: 1 1 auto;
+    min-width: 96px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 243, 255, 0.45);
+    border-radius: 6px;
+    background: rgba(0, 243, 255, 0.08);
+    color: #bff6ff;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.account-btn:hover:not(:disabled) {
+    background: rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.35);
+}
+
+.account-btn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+}
+
+.account-btn-primary {
+    border-color: #00f3ff;
+    background: rgba(0, 243, 255, 0.22);
+    color: #eafdff;
+    font-weight: 700;
+}
+
+.account-btn-ghost {
+    border-color: rgba(226, 241, 247, 0.28);
+    background: transparent;
+    color: rgba(226, 241, 247, 0.78);
+}
+
+.account-identity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.account-name {
+    font-family: "Orbitron", sans-serif;
+    font-size: 17px;
+    color: #eafdff;
+}
+
+.account-badge {
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 0, 127, 0.55);
+    border-radius: 10px;
+    font-size: 11px;
+    color: #ff7fb8;
+}
+
+.account-stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.account-stat {
+    padding: 8px;
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    text-align: center;
+}
+
+.account-stat-label {
+    display: block;
+    font-size: 11px;
+    color: rgba(226, 241, 247, 0.6);
+}
+
+.account-stat-value {
+    display: block;
+    margin-top: 2px;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 18px;
+    color: #ffd76a;
+}
+
+.account-message {
+    min-height: 18px;
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: #7ef9ff;
+}
+
+.account-message.is-error {
+    color: #ff6b9d;
+}
+
+/* ── 顶栏账号信息 ── */
+.account-hud {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    padding: 4px 10px;
+    border: 1px solid rgba(0, 243, 255, 0.35);
+    border-radius: 6px;
+    background: rgba(0, 20, 40, 0.6);
+    color: #bff6ff;
+    font-family: inherit;
+    line-height: 1.25;
+    cursor: pointer;
+}
+
+.account-hud:hover {
+    border-color: #00f3ff;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.35);
+}
+
+.account-hud-name {
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.account-hud-coins {
+    font-family: "Share Tech Mono", monospace;
+    font-size: 11px;
+    color: #ffd76a;
+}
+
+/* ── 战绩 / 排行榜弹层 ── */
+.account-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 2200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2, 6, 16, 0.78);
+    backdrop-filter: blur(3px);
+}
+
+.account-modal-backdrop[hidden] {
+    display: none;
+}
+
+.account-modal {
+    display: flex;
+    flex-direction: column;
+    width: min(560px, 100%);
+    max-height: min(78vh, 620px);
+    border: 1px solid rgba(0, 243, 255, 0.45);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(6, 24, 60, 0.98), rgba(3, 10, 24, 0.98));
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.25);
+}
+
+.account-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.22);
+}
+
+.account-modal-title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #7ef9ff;
+}
+
+.account-modal-close-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(226, 241, 247, 0.3);
+    border-radius: 50%;
+    background: transparent;
+    color: #e2f1f7;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.account-modal-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px 0;
+}
+
+.account-modal-tab {
+    padding: 6px 14px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    background: rgba(0, 0, 0, 0.35);
+    color: rgba(226, 241, 247, 0.7);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.account-modal-tab.active {
+    background: rgba(0, 243, 255, 0.18);
+    color: #eafdff;
+}
+
+.account-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px 18px;
+}
+
+.account-modal-empty {
+    margin: 24px 0;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(226, 241, 247, 0.6);
+}
+
+.account-modal-empty.is-error {
+    color: #ff6b9d;
+}
+
+.account-record-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.account-record-item {
+    display: grid;
+    grid-template-columns: 1.1fr 0.7fr 0.5fr 0.8fr 1.4fr;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border: 1px solid rgba(0, 243, 255, 0.18);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.32);
+    font-size: 12px;
+    color: rgba(226, 241, 247, 0.86);
+}
+
+.account-record-item.is-win {
+    border-color: rgba(255, 215, 106, 0.45);
+}
+
+.account-record-item.is-self {
+    border-color: #00f3ff;
+    background: rgba(0, 243, 255, 0.12);
+}
+
+.account-rank {
+    font-family: "Orbitron", sans-serif;
+    color: #ffd76a;
+}
+
+.account-record-score {
+    font-family: "Share Tech Mono", monospace;
+    font-weight: 700;
+}
+
+.account-record-score.is-gain {
+    color: #7ef9ff;
+}
+
+.account-record-score.is-loss {
+    color: #ff6b9d;
+}
+
+.account-record-time {
+    font-size: 11px;
+    color: rgba(226, 241, 247, 0.55);
+}
+
+/* ── 设置面板里的服务器地址（已固定线上地址，默认隐藏） ── */
+.settings-server-row,
+.settings-server-row[hidden] {
+    display: none !important;
+}
+
+.settings-server-row input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #e2f1f7;
+    font-family: "Share Tech Mono", monospace;
+    font-size: 13px;
+}
+
+.settings-server-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.settings-server-hint {
+    font-size: 11px;
+    line-height: 1.5;
+    color: rgba(226, 241, 247, 0.6);
+    word-break: break-all;
+}
+
+.settings-server-hint.is-error {
+    color: #ff6b9d;
+}
+
+/* ── 手机横屏：压缩账号面板，别把“进入房间”按钮顶出屏幕 ── */
+@media (max-width: 960px) and (orientation: landscape) {
+    .account-panel {
+        max-width: 100%;
+        margin-top: 10px;
+        padding: 10px 12px;
+    }
+
+    .account-hint {
+        margin-bottom: 8px;
+    }
+
+    .account-stat-row {
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+
+    .account-stat-value {
+        font-size: 15px;
+    }
+
+    .account-btn {
+        min-width: 78px;
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .account-hud-name {
+        max-width: 72px;
+    }
+
+    .account-record-item {
+        grid-template-columns: 1fr 0.6fr 0.5fr 0.7fr;
+        font-size: 11px;
+    }
+
+    .account-record-time {
+        display: none;
+    }
+}

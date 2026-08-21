@@ -1,0 +1,7 @@
+﻿com.dianyou.app.market
+com.huawei.KoBackup
+com.snssdk.api.embed
+com.tencent.ams
+com.tencent.tbsad
+com.tencent.tgp-ext
+com.xingzuodaoshi.infinityUpgrade

@@ -1,0 +1,287 @@
+/*
+   手机横屏独立布局
+   牌桌按照 1400 × 640 的宽屏设计基准整体缩放；缩放比例由 app.js 根据真实可用宽高计算。
+   这份文件必须晚于 style.css 加载，确保不受桌面固定尺寸规则影响。
+*/
+:root {
+    --mobile-table-scale: 1;
+}
+
+@media (max-width: 932px) and (orientation: landscape) {
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden !important;
+    }
+
+    .workspace-container {
+        height: 100dvh !important;
+        min-height: 0 !important;
+        display: block !important;
+    }
+
+    .terminal-header {
+        position: fixed !important;
+        z-index: 1100 !important;
+        top: var(--mobile-board-top, 12px) !important;
+        right: var(--mobile-board-right, 12px) !important;
+        min-height: 0 !important;
+        height: auto !important;
+        width: auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        overflow: visible !important;
+        pointer-events: none;
+    }
+
+    /* 手机对局只保留牌桌，房间与设置从该界面隐藏。 */
+    .terminal-header {
+        display: none !important;
+    }
+
+    .header-left,
+    .header-center,
+    .room-status,
+    .time-display {
+        display: none !important;
+    }
+
+    .header-right {
+        width: auto !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        pointer-events: auto;
+    }
+
+    .room-menu-btn,
+    .settings-icon-btn {
+        min-width: 48px !important;
+        min-height: 40px !important;
+        border: 1px solid rgba(0, 243, 255, 0.72) !important;
+        background: rgba(2, 18, 35, 0.94) !important;
+        color: var(--cyan) !important;
+        box-shadow: none !important;
+    }
+
+    .terminal-header.room-menu-collapsed .header-right > :not(.room-menu-btn):not(.settings-icon-btn) {
+        display: none !important;
+    }
+
+    .terminal-header.room-menu-open .header-right {
+        top: 52px !important;
+        right: 10px !important;
+        width: min(300px, calc(100vw - 20px)) !important;
+        max-height: calc(100dvh - 62px) !important;
+        justify-content: flex-start !important;
+    }
+
+    .terminal-body,
+    .table-simulator-section,
+    .mahjong-table-wrapper {
+        min-height: 0 !important;
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .terminal-body {
+        display: block !important;
+    }
+
+    .table-simulator-section {
+        display: block !important;
+    }
+
+    .section-title-bar,
+    .terminal-log-panel,
+    .newbie-guide,
+    .action-guide {
+        display: none !important;
+    }
+
+    .mahjong-table-wrapper {
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 10px !important;
+        perspective: none !important;
+    }
+
+    .mahjong-table {
+        flex: 0 0 auto !important;
+        width: 1400px !important;
+        height: 640px !important;
+        min-width: 1400px !important;
+        min-height: 520px !important;
+        margin: 0 !important;
+        transform: scale(var(--mobile-table-scale)) !important;
+        transform-origin: center center !important;
+    }
+
+    /* 桌面版给侧家预留的 118px 偏移会把立牌推入牌河；手机上固定贴近四边。 */
+    .player-north { top: 14px !important; }
+    .player-south { bottom: 14px !important; }
+    .player-west { left: 14px !important; }
+    .player-east { right: 14px !important; }
+    .player-west .vertical-tiles,
+    .player-east .vertical-tiles,
+    .player-north .horizontal-tiles { margin: 0 !important; }
+
+    /* 东西两家保留竖向牌列，但每一张牌横放。 */
+    .player-west,
+    .player-east {
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .player-west .vertical-tiles,
+    .player-east .vertical-tiles {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1px !important;
+    }
+
+    .player-west .tile-back.vertical,
+    .player-east .tile-back.vertical {
+        width: 52px !important;
+        height: 34px !important;
+    }
+
+    /* 牌河的已打出牌同步放大，避免在全屏桌面中难以辨认。 */
+    .discard-container .mahjong-tile.mini-tile {
+        width: 42px !important;
+        height: 58px !important;
+    }
+
+    /* 定缺是开局的独立步骤：出现时只显示选择界面，不遮挡或挤压牌桌。 */
+    #dingque-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 1200 !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: max(20px, env(safe-area-inset-top))
+            max(24px, env(safe-area-inset-right))
+            max(20px, env(safe-area-inset-bottom))
+            max(24px, env(safe-area-inset-left)) !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 16px !important;
+        background: radial-gradient(circle at center, #0b2840 0%, #040a13 72%) !important;
+        transform: none !important;
+    }
+
+    /* 行内 display:none 是游戏逻辑在玩家完成定缺后写入的状态。 */
+    #dingque-overlay.is-hidden,
+    #dingque-overlay[style*="display: none"] {
+        display: none !important;
+    }
+
+    .dingque-title {
+        font-size: clamp(24px, 4vw, 34px) !important;
+    }
+
+    .dingque-options {
+        width: min(620px, 88vw) !important;
+        gap: 14px !important;
+    }
+
+    .que-btn {
+        min-width: 96px !important;
+        min-height: 92px !important;
+    }
+
+    .dingque-hint {
+        max-width: min(620px, 88vw) !important;
+        text-align: center !important;
+    }
+
+    .settings-panel {
+        top: 52px !important;
+        right: 10px !important;
+        max-height: calc(100dvh - 62px) !important;
+        overflow-y: auto !important;
+    }
+}
+
+@media (max-width: 932px) and (orientation: portrait) {
+    /* 已锁定横屏，竖屏时不额外显示“请旋转”遮罩。 */
+    .mobile-landscape-notice {
+        display: none !important;
+    }
+}
+
+/* 隐藏属性是页面状态的最终开关，必须覆盖牌桌布局的 display 规则。 */
+.workspace-container[hidden] {
+    display: none !important;
+}
+
+/* 定缺是开局步骤，居中悬浮在牌桌中心上方 */
+@media (orientation: landscape) {
+    #dingque-overlay {
+        position: fixed !important;
+        top: 48% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: min(390px, 86vw) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 14px 18px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        border: 2px solid rgba(0, 243, 255, 0.42) !important;
+        border-radius: 14px !important;
+        background: rgba(3, 12, 25, 0.95) !important;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65), 0 0 24px rgba(0, 243, 255, 0.28) !important;
+        backdrop-filter: blur(12px) !important;
+        z-index: 1400 !important;
+    }
+
+    /* 玩家完成定缺后必须真正隐藏；放在横屏强制 display 规则之后，避免被重新显示。 */
+    #dingque-overlay.is-hidden,
+    #dingque-overlay[style*="display: none"] {
+        display: none !important;
+    }
+
+    #dingque-overlay .dingque-title {
+        font-size: 17px !important;
+        text-align: center !important;
+    }
+
+    #dingque-overlay .dingque-options {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 10px !important;
+    }
+
+    #dingque-overlay .que-btn {
+        flex: 1 !important;
+        min-width: 0 !important;
+        min-height: 52px !important;
+        padding: 6px 4px !important;
+    }
+
+    #dingque-overlay .que-btn .que-symbol {
+        font-size: 22px !important;
+    }
+
+    #dingque-overlay .dingque-hint {
+        font-size: 11px !important;
+        line-height: 1.35 !important;
+        text-align: center !important;
+    }
+}

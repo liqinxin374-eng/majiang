@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科幻四川麻将 - 界面组件展示柜</title>
+    <!-- Google Fonts for Futuristic Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .showroom-standalone-container {
+            width: 100%;
+            min-height: 100vh;
+            padding: 30px;
+            box-sizing: border-box;
+            background: var(--cyber-bg);
+            z-index: 5;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        .showroom-panel-section {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(8, 14, 25, 0.95);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--panel-shadow);
+        }
+        .tiles-grid {
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        }
+    </style>
+</head>
+<body class="cyber-terminal theme-sci-fi">
+    <!-- Grid overlay background -->
+    <div class="terminal-grid-overlay"></div>
+    <div class="scanline-overlay"></div>
+
+    <!-- Main Workspace Container -->
+    <div class="workspace-container">
+        <div class="showroom-standalone-container">
+            <!-- 展示柜控制面板 -->
+            <section class="showroom-panel-section">
+                <div class="section-title-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 2px solid var(--glass-border); padding-bottom: 15px;">
+                    <div class="title-text">
+                        <span class="theme-content sci-fi-inline">科幻界面组件展示柜</span>
+                        <span class="theme-content classic-inline">国风博弈组件展示柜</span>
+                        <span class="theme-content xianxia-inline">瑶池仙门博弈展示柜</span>
+                    </div>
+                    <!-- 顶部快速切换主题面板 -->
+                    <div class="showroom-theme-container" id="theme-switcher-container" style="display: flex; gap: 8px;">
+                        <button class="theme-toggle-btn active" data-theme="sci-fi" type="button" style="padding: 6px 14px; font-family: var(--font-cyber); font-size: 13px; background: rgba(10, 19, 31, 0.6); border: 1px solid var(--glass-border); color: var(--text-dim); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">🪐 科幻</button>
+                        <button class="theme-toggle-btn" data-theme="classic" type="button" style="padding: 6px 14px; font-family: var(--font-cyber); font-size: 13px; background: rgba(10, 19, 31, 0.6); border: 1px solid var(--glass-border); color: var(--text-dim); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">🏺 国风</button>
+                        <button class="theme-toggle-btn" data-theme="xianxia" type="button" style="padding: 6px 14px; font-family: var(--font-cyber); font-size: 13px; background: rgba(10, 19, 31, 0.6); border: 1px solid var(--glass-border); color: var(--text-dim); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">🔮 仙侠</button>
+                    </div>
+                </div>
+
+                <div class="showroom-tabs" style="margin-top: 20px;">
+                    <button class="tab-btn active" data-tab="tab-tiles">🀄️ 牌面设计</button>
+                    <button class="tab-btn" data-tab="tab-avatar">👤 头像与状态</button>
+                    <button class="tab-btn" data-tab="tab-table">🧭 牌桌与场景</button>
+                    <button class="tab-btn" data-tab="tab-animations">⚡ 特效调试</button>
+                </div>
+
+                <!-- Tab 1: Tiles Showroom -->
+                <div class="showroom-tab-content active" id="tab-tiles">
+                    <div class="showroom-intro">
+                        <h3 class="theme-content sci-fi-content">科幻风麻将牌面设计说明</h3>
+                        <h3 class="theme-content classic-content">古典水墨麻将牌面设计说明</h3>
+                        <h3 class="theme-content xianxia-content">灵玉仙气麻将牌面设计说明</h3>
+                        
+                        <p class="theme-content sci-fi-content">传统麻将符号被重新演绎为具有发光能级的半透明高科技元件。边缘采用微米级雕刻线条，配合内部发光电路。</p>
+                        <p class="theme-content classic-content">传统麻将符号回归水墨国风。墨宝勾勒万字，翠竹雕琢条子，碧水渲染筒子，端庄典雅，重现宣纸墨宝之神韵。</p>
+                        <p class="theme-content xianxia-content">麻将符号与修真道法融为一体。太极阴阳凝聚为筒，青莲飞剑雕琢为条，天罡法咒绘就为万，莹润白玉折射着飘逸灵光。</p>
+                    </div>
+
+                    <div class="tile-category-group">
+                        <h4 class="category-title">
+                            <span class="theme-content sci-fi-inline">筒子 - 聚能环核心</span>
+                            <span class="theme-content classic-inline">筒子 - 碧水墨轮</span>
+                            <span class="theme-content xianxia-inline">筒子 - 太极乾坤镜</span>
+                        </h4>
+                        <div class="tiles-grid" id="showroom-dots-grid">
+                            <!-- 1-9 dots dynamically populated -->
+                        </div>
+                    </div>
+
+                    <div class="tile-category-group">
+                        <h4 class="category-title">
+                            <span class="theme-content sci-fi-inline">条子 - 等离子激光束</span>
+                            <span class="theme-content classic-inline">条子 - 绿意墨竹</span>
+                            <span class="theme-content xianxia-inline">条子 - 青莲飞剑</span>
+                        </h4>
+                        <div class="tiles-grid" id="showroom-bamboos-grid">
+                            <!-- 1-9 bamboos dynamically populated -->
+                        </div>
+                    </div>
+
+                    <div class="tile-category-group">
+                        <h4 class="category-title">
+                            <span class="theme-content sci-fi-inline">万字 - 量子折线字符</span>
+                            <span class="theme-content classic-inline">万字 - 簪花妙笔</span>
+                            <span class="theme-content xianxia-inline">万字 - 朱砂天诀</span>
+                        </h4>
+                        <div class="tiles-grid" id="showroom-characters-grid">
+                            <!-- 1-9 characters dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Avatar Showroom -->
+                <div class="showroom-tab-content" id="tab-avatar">
+                    <div class="showroom-intro">
+                        <h3 class="theme-content sci-fi-content">全息头像与“血战”状态演示</h3>
+                        <h3 class="theme-content classic-content">古风头像与“血战”博弈状态演示</h3>
+                        <h3 class="theme-content xianxia-content">仙牌化身与“渡劫飞升”境界演示</h3>
+                        
+                        <p class="theme-content sci-fi-content">在“血战到底”规则中，胡牌者退场（安全撤离），破产者离线，其余玩家继续作战。头像框可动态显示不同的防护罩强度和系统状态。</p>
+                        <p class="theme-content classic-content">在“血战到底”博弈中，胡牌者功成抽身，筹码耗尽者遗憾离场，余家继续相博。经典框饰动态见证胜负沉浮。</p>
+                        <p class="theme-content xianxia-content">在“血战到底”仙劫中，飞升者退场，力竭气衰者离线闭关，其余修仙者在浩瀚法阵中继续抢夺造化。仙牌法圈流转，昭示灵力变化。</p>
+                    </div>
+
+                    <div class="avatar-demo-container">
+                        <!-- 演示头像1：行动中 -->
+                        <div class="avatar-demo-box">
+                            <div class="avatar-frame frame-demo-active">
+                                <img src="" alt="行动中头像" class="avatar-img demo-img-1">
+                                <div class="avatar-scanline"></div>
+                                <div class="status-overlay">行动中</div>
+                            </div>
+                            <div class="demo-label">
+                                <span class="primary">
+                                    <span class="theme-content sci-fi-inline">正常作战中</span>
+                                    <span class="theme-content classic-inline">思索博弈中</span>
+                                    <span class="theme-content xianxia-inline">仙术御空中</span>
+                                </span>
+                                <span class="secondary">
+                                    <span class="theme-content sci-fi-inline text-cyan">能量满载（护盾100%）</span>
+                                    <span class="theme-content classic-inline text-cyan">气定神闲（筹码充足）</span>
+                                    <span class="theme-content xianxia-inline text-cyan">金丹护体（灵力100%）</span>
+                                </span>
+                            </div>
+                            <button class="demo-action-btn" onclick="testAvatarState('south', 'active')">应用到主角</button>
+                        </div>
+
+                        <!-- 演示头像2：已胡 -->
+                        <div class="avatar-demo-box">
+                            <div class="avatar-frame frame-demo-esc">
+                                <img src="" alt="已胡头像" class="avatar-img demo-img-2">
+                                <div class="avatar-scanline"></div>
+                                <div class="status-overlay">已胡</div>
+                            </div>
+                            <div class="demo-label">
+                                <span class="primary">
+                                    <span class="theme-content sci-fi-inline">胡牌安全撤离</span>
+                                    <span class="theme-content classic-inline">胡牌鸣金收兵</span>
+                                    <span class="theme-content xianxia-inline">白日飞升成仙</span>
+                                </span>
+                                <span class="secondary">
+                                    <span class="theme-content sci-fi-inline text-green">超载已结算</span>
+                                    <span class="theme-content classic-inline text-green">功成身退</span>
+                                    <span class="theme-content xianxia-inline text-green">功德圆满</span>
+                                </span>
+                            </div>
+                            <button class="demo-action-btn" onclick="testAvatarState('south', 'esc')">应用到主角</button>
+                        </div>
+
+                        <!-- 演示头像3：警戒 -->
+                        <div class="avatar-demo-box">
+                            <div class="avatar-frame frame-demo-alert">
+                                <img src="" alt="警戒头像" class="avatar-img demo-img-3">
+                                <div class="avatar-scanline"></div>
+                                <div class="status-overlay">警戒</div>
+                            </div>
+                            <div class="demo-label">
+                                <span class="primary">
+                                    <span class="theme-content sci-fi-inline">受到刮风下雨</span>
+                                    <span class="theme-content classic-inline">惨遭刮风下雨</span>
+                                    <span class="theme-content xianxia-inline">遭遇神雷天劫</span>
+                                </span>
+                                <span class="secondary">
+                                    <span class="theme-content sci-fi-inline text-orange">警告：正在扣除积分</span>
+                                    <span class="theme-content classic-inline text-orange">叹息：扣除筹码中</span>
+                                    <span class="theme-content xianxia-inline text-orange">警告：天道扣除造化</span>
+                                </span>
+                            </div>
+                            <button class="demo-action-btn" onclick="testAvatarState('south', 'alert')">应用到主角</button>
+                        </div>
+
+                        <!-- 演示头像4：破产 -->
+                        <div class="avatar-demo-box">
+                            <div class="avatar-frame frame-demo-bankrupt">
+                                <img src="" alt="破产头像" class="avatar-img demo-img-4">
+                                <div class="avatar-scanline"></div>
+                                <div class="status-overlay">破产</div>
+                            </div>
+                            <div class="demo-label">
+                                <span class="primary">
+                                    <span class="theme-content sci-fi-inline">积分耗尽破产</span>
+                                    <span class="theme-content classic-inline">筹码耗尽出局</span>
+                                    <span class="theme-content xianxia-inline">气运耗尽陨落</span>
+                                </span>
+                                <span class="secondary">
+                                    <span class="theme-content sci-fi-inline text-magenta">系统离线，已停机</span>
+                                    <span class="theme-content classic-inline text-magenta">抱憾退场</span>
+                                    <span class="theme-content xianxia-inline text-magenta">强制闭关修炼</span>
+                                </span>
+                            </div>
+                            <button class="demo-action-btn" onclick="testAvatarState('south', 'bankrupt')">应用到主角</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Table Showroom -->
+                <div class="showroom-tab-content" id="tab-table">
+                    <div class="showroom-intro">
+                        <h3 class="theme-content sci-fi-content">全息科幻牌桌与场景整合说明</h3>
+                        <h3 class="theme-content classic-content">古典国风红木牌桌与场景整合说明</h3>
+                        <h3 class="theme-content xianxia-content">瑶池碧玉两仪牌桌与场景整合说明</h3>
+                        
+                        <p class="theme-content sci-fi-content">整合展示：包含高碳合金底盘大牌桌、四方玩家状态、定缺及吃碰杠胡控制面板。手牌与牌河成功填充 3D 赛博全息发光牌面，视觉效果浑然一体。</p>
+                        <p class="theme-content classic-content">整合展示：红木边框牌桌上整齐排列着竹简黄色墨宝手牌，牌河里散落着打出的字牌。四角摆放着典雅的国风玩家卡，透露出浓郁的书香雅趣。</p>
+                        <p class="theme-content xianxia-content">整合展示：羊脂白玉围栏包围起阴阳两仪太极罗盘，四方仙家各显神通（飞升、天劫、闭关）。手牌皆为翡翠白玉行楷大字，彰显出世脱俗的玄门境界。</p>
+                    </div>
+
+                    <div class="table-demo-wrapper" style="width: 100%; height: 680px; position: relative; margin-top: 20px; overflow: hidden; background: rgba(5, 10, 20, 0.45); border-radius: 12px; border: 1px solid var(--glass-border);">
+                        <!-- 直接复刻 index.html 上的完整 mahjong-table-wrapper 结构 -->
+                        <div class="mahjong-table-wrapper" style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; padding: 25px;">
+                            <div class="mahjong-table" style="position: relative; width: 100%; height: 100%; max-width: 780px; max-height: 540px; margin: 0 auto; pointer-events: none;">
+                                <!-- 1. 牌桌中心核心 -->
+                                <div class="table-center-core">
+                                    <div class="quantum-dice-box">
+                                        <div class="dice-digit" style="font-size: 16px; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center;">3</div>
+                                        <div class="dice-digit" style="font-size: 16px; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center;">6</div>
+                                    </div>
+                                    <div class="wind-indicator-ring" style="display: flex; gap: 8px; font-size: 11px;">
+                                        <span class="wind-sector">东</span>
+                                        <span class="wind-sector active">南</span>
+                                        <span class="wind-sector">西</span>
+                                        <span class="wind-sector">北</span>
+                                    </div>
+                                    <div class="center-stats" style="margin-top: 5px; font-size: 9px; opacity: 0.8; text-align: center;">
+                                        <div class="stat-row" style="display: flex; justify-content: space-between; gap: 10px;"><span class="lbl">剩余牌</span><span class="val">84</span></div>
+                                    </div>
+                                </div>
+                                <div class="center-border-box"></div>
+
+                                <!-- 2. 牌河弃牌池 -->
+                                <div class="discard-container">
+                                    <div class="discard-sub-grid grid-south" id="showroom-discard-pool" style="display: flex; gap: 3px; justify-content: center; padding: 5px;">
+                                        <!-- 动态注入弃牌 -->
+                                    </div>
+                                </div>
+
+                                <!-- 3. 定缺面板展示 -->
+                                <div class="dingque-panel" style="display: flex; transform: translate(-50%, -50%) scale(0.7); top: 38%; pointer-events: none;">
+                                    <div class="dingque-title" style="font-size: 14px;">请选择定缺花色</div>
+                                    <div class="dingque-options" style="gap: 8px;">
+                                        <button class="que-btn"><span class="que-symbol" style="font-size: 16px;">萬</span></button>
+                                        <button class="que-btn"><span class="que-symbol" style="font-size: 16px;">条</span></button>
+                                        <button class="que-btn"><span class="que-symbol" style="font-size: 16px;">筒</span></button>
+                                    </div>
+                                </div>
+
+                                <!-- 4. 吃碰杠胡动作面板展示 -->
+                                <div class="action-dock" style="display: flex; gap: 8px; bottom: 85px; transform: translateX(-50%) scale(0.75); pointer-events: none;">
+                                    <button class="action-btn btn-peng"><span class="btn-char" style="font-size: 18px;">碰</span></button>
+                                    <button class="action-btn btn-gang"><span class="btn-char" style="font-size: 18px;">杠</span></button>
+                                    <button class="action-btn btn-hu"><span class="btn-char" style="font-size: 18px;">胡</span></button>
+                                </div>
+
+                                <!-- 5. 玩家北家（上方）- 已胡 -->
+                                <div class="player-area player-north">
+                                    <div class="player-info-card" style="transform: scale(0.75); transform-origin: top center;">
+                                        <div class="avatar-frame">
+                                            <img src="./avatar_cyber_bird.png" class="avatar-img set-img-2">
+                                            <div class="status-overlay" style="display: block;">已胡</div>
+                                        </div>
+                                        <div class="player-details">
+                                            <div class="player-name">北家仙尊</div>
+                                            <div class="player-que-status font-share text-green">定缺：筒</div>
+                                        </div>
+                                    </div>
+                                    <div class="opponent-hand horizontal-tiles" style="opacity: 0.65; transform: scale(0.9); transform-origin: top center;">
+                                        <div class="tile-back mini-tile"></div>
+                                        <div class="tile-back mini-tile"></div>
+                                        <div class="tile-back mini-tile"></div>
+                                        <div class="tile-back mini-tile"></div>
+                                        <div class="tile-back mini-tile"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 6. 玩家西家（左方）- 破产 -->
+                                <div class="player-area player-west">
+                                    <div class="player-info-card" style="transform: scale(0.75); transform-origin: center left;">
+                                        <div class="avatar-frame">
+                                            <img src="./avatar_neon_wolf.png" class="avatar-img set-img-4">
+                                            <div class="status-overlay" style="display: block;">破产</div>
+                                        </div>
+                                        <div class="player-details">
+                                            <div class="player-name">西家羽士</div>
+                                            <div class="player-que-status font-share text-magenta">定缺：条</div>
+                                        </div>
+                                    </div>
+                                    <div class="opponent-hand vertical-tiles" style="opacity: 0.65; transform: scale(0.9); transform-origin: center left;">
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 7. 玩家东家（右方）- 警戒/天劫 -->
+                                <div class="player-area player-east">
+                                    <div class="player-info-card" style="transform: scale(0.75); transform-origin: center right;">
+                                        <div class="avatar-frame">
+                                            <img src="./avatar_matrix_cat.png" class="avatar-img set-img-3">
+                                            <div class="status-overlay" style="display: block;">警戒</div>
+                                        </div>
+                                        <div class="player-details">
+                                            <div class="player-name">东家真人</div>
+                                            <div class="player-que-status font-share text-cyan">定缺：万</div>
+                                        </div>
+                                    </div>
+                                    <div class="opponent-hand vertical-tiles" style="opacity: 0.65; transform: scale(0.9); transform-origin: center right;">
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                        <div class="tile-back mini-tile vertical"></div>
+                                    </div>
+                                </div>
+
+                                <!-- 8. 玩家南家（下方，主角）- 行动中 -->
+                                <div class="player-area player-south">
+                                    <div class="south-hand-row" style="position: relative;">
+                                        <div class="player-info-card active-turn" style="transform: scale(0.75); transform-origin: bottom center; position: absolute; left: -110px; bottom: 0;">
+                                            <div class="avatar-frame">
+                                                <img src="./avatar_commander.png" class="avatar-img set-img-1">
+                                                <div class="status-overlay" style="display: block;">行动中</div>
+                                            </div>
+                                            <div class="player-details">
+                                                <div class="player-name">主角道友</div>
+                                                <div class="player-que-status font-share text-green">定缺：筒</div>
+                                            </div>
+                                        </div>
+                                        <!-- 动态注入主角手牌 -->
+                                        <div id="showroom-hand-south" style="display: flex; gap: 2px;">
+                                            <!-- SVG Tiles -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Animations & Events Showroom -->
+                <div class="showroom-tab-content" id="tab-animations">
+                    <div class="showroom-intro">
+                        <h3 class="theme-content sci-fi-content">科幻粒子动效调试器</h3>
+                        <h3 class="theme-content classic-content">国风水墨意境操作演示</h3>
+                        <h3 class="theme-content xianxia-content">九天玄门仙法异象调试</h3>
+                        
+                        <p class="theme-content sci-fi-content">点击按钮触发对应的四川麻将经典操作的全息投影提示，观察屏幕中心的震撼科幻波形特效。</p>
+                        <p class="theme-content classic-content">点击按钮唤起水墨写意特效，体验经典国风书法大字与淡雅水墨的博弈风骨。</p>
+                        <p class="theme-content xianxia-content">点击触发对应的仙术法咒特效，感受瑶池云烟激荡、金光闪烁的玄门博弈异象。</p>
+                    </div>
+
+                    <div class="action-test-grid">
+                        <button class="test-anim-btn anim-peng" onclick="triggerHoloAlert('碰', '触发碰牌效果', 'cyan')">
+                            <span class="theme-content sci-fi-inline">触发「碰」全息警报</span>
+                            <span class="theme-content classic-inline">触发「碰」写意水墨</span>
+                            <span class="theme-content xianxia-inline">触发「碰」青莲仙波</span>
+                        </button>
+                        <button class="test-anim-btn anim-gang" onclick="triggerHoloAlert('杠', '触发杠牌效果', 'orange')">
+                            <span class="theme-content sci-fi-inline">触发「杠」全息能量</span>
+                            <span class="theme-content classic-inline">触发「杠」翠竹破土</span>
+                            <span class="theme-content xianxia-inline">触发「杠」两仪法阵</span>
+                        </button>
+                        <button class="test-anim-btn anim-hu" onclick="triggerHoloAlert('胡', '触发胡牌效果', 'magenta')">
+                            <span class="theme-content sci-fi-inline">触发「胡」超载爆裂</span>
+                            <span class="theme-content classic-inline">触发「胡」金印朱砂</span>
+                            <span class="theme-content xianxia-inline">触发「胡」万剑归宗</span>
+                        </button>
+                        <button class="test-anim-btn anim-rain" onclick="triggerHoloAlert('雨', '触发刮风下雨结算效果', 'green')">
+                            <span class="theme-content sci-fi-inline">触发「刮风下雨」能量夺取</span>
+                            <span class="theme-content classic-inline">触发「刮风下雨」巴蜀烟雨</span>
+                            <span class="theme-content xianxia-inline">触发「刮风下雨」夺天造化</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script type="module" src="./app.js"></script>
+</body>
+</html>

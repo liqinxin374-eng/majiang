@@ -1,0 +1,2 @@
+﻿Filesystem     Size  Used Avail Use% Mounted on
+/data/media    109G  104G  5.1G  96% /storage/emulated

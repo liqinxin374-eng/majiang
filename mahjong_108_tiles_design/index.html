@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>108张真实麻将牌设计与资源归档</title>
+  <style>
+    body {
+      background: #091c16;
+      color: #e0f2fe;
+      font-family: 'Noto Serif SC', 'Kaiti', serif;
+      padding: 24px;
+      margin: 0;
+    }
+    h1 { text-align: center; color: #fff2a8; margin-bottom: 8px; }
+    p.desc { text-align: center; color: #8bbfae; font-size: 14px; margin-bottom: 24px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: rgba(14, 48, 41, 0.8);
+      border: 1px solid rgba(230, 202, 101, 0.35);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .card:hover { border-color: #fff2a8; transform: translateY(-4px); transition: all 0.2s; }
+    .img-box { width: 60px; height: 82px; }
+    .img-box svg { width: 100%; height: 100%; }
+    .title { font-size: 14px; color: #fff2a8; font-weight: bold; }
+    .sub { font-size: 11px; color: #76baa3; }
+  </style>
+</head>
+<body>
+  <h1>108张真实麻将牌设计与矢量资源归档</h1>
+  <p class="desc">包含 36张万字牌 + 36张饼字牌 + 36张条字牌 高精度矢量 SVG 资源</p>
+  <div id="grid" class="grid"></div>
+  <script src="mahjong-renderer.js"></script>
+  <script>
+    const grid = document.getElementById('grid');
+    const cats = [{ k: 'wan', n: '万' }, { k: 'bing', n: '饼' }, { k: 'tiao', n: '条' }];
+    cats.forEach(c => {
+      for (let v = 1; v <= 9; v++) {
+        for (let copy = 1; copy <= 4; copy++) {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const img = document.createElement('div');
+          img.className = 'img-box';
+          const svg = MahjongRenderer.renderTileFace(c.k, v);
+          img.innerHTML = `<svg viewBox="0 0 100 135" width="100%" height="100%">
+            <rect x="2" y="2" width="96" height="131" rx="6" ry="6" fill="#F4FBF7" stroke="#FFFFFF" stroke-width="2"/>
+            ${svg.replace('<svg viewBox="0 0 100 135" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">', '').replace('</svg>', '')}
+          </svg>`;
+          card.innerHTML = `<div class="img-box">${img.innerHTML}</div><div class="title">${v}${c.n}</div><div class="sub">第 ${copy} 张</div>`;
+          grid.appendChild(card);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

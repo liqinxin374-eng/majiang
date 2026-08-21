@@ -1,0 +1,7 @@
+﻿21810	/sdcard/Android/data/com.xingzuodaoshi.infinityUpgrade
+23	/sdcard/Android/data/com.tencent.ams
+18	/sdcard/Android/data/com.tencent.tgp-ext
+18	/sdcard/Android/data/com.dianyou.app.market
+11	/sdcard/Android/data/com.snssdk.api.embed
+11	/sdcard/Android/data/com.huawei.KoBackup
+4	/sdcard/Android/data/com.tencent.tbsad

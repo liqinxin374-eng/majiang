@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>科幻四川麻将「血战到底」全息控制台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23060a12'/%3E%3Crect x='17' y='10' width='30' height='44' rx='4' fill='%23e2f1f7' stroke='%2300f3ff' stroke-width='3'/%3E%3Cpath d='M24 22h16M24 32h16M24 42h16' stroke='%23ff007f' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+    <!-- Google Fonts for Futuristic Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css?v=3.2">
+    <!-- 账号面板、战绩排行榜、服务器地址设置的样式。 -->
+    <link rel="stylesheet" href="./account.css?v=2">
+    <!-- 手机横屏规则单独放在主样式之后，避免被桌面版固定尺寸覆盖。 -->
+    <link rel="stylesheet" href="./mobile-landscape.css?v=2">
+</head>
+<body class="cyber-terminal theme-sci-fi theme-background-sci-fi theme-tile-sci-fi theme-table-sci-fi home-active">
+    <!-- 全屏主题背景画布组件：根据当前选择的背景主题动态呈现 -->
+    <div class="theme-bg-canvas theme-bg-sci-fi-canvas" aria-hidden="true">
+        <img src="./themes/sci_fi_cyber_bg.jpg" class="theme-real-bg bg-sci-fi-img" alt="">
+    </div>
+    <div class="theme-bg-canvas theme-bg-classic-canvas" aria-hidden="true">
+        <img src="./themes/classic_chinese_bg.jpg" class="theme-real-bg bg-classic-img" alt="">
+    </div>
+    <div class="theme-bg-canvas theme-bg-xianxia-canvas xianxia-bg-canvas" aria-hidden="true">
+        <img src="./themes/xianxia_cloud_bg.jpg" class="theme-real-bg xianxia-real-bg bg-xianxia-img" alt="">
+    </div>
+    <div class="mist-overlay-layer mist-layer-1" aria-hidden="true"></div>
+    <div class="mist-overlay-layer mist-layer-2" aria-hidden="true"></div>
+    <div class="fairy-particles" aria-hidden="true">
+        <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div>
+        <div class="particle p4"></div><div class="particle p5"></div>
+    </div>
+    <!-- Grid overlay background -->
+    <div class="terminal-grid-overlay"></div>
+    <div class="scanline-overlay"></div>
+
+    <!-- 首页：玩家主动进入房间后才创建牌局和显示牌桌。 -->
+    <section class="home-screen" id="home-screen" aria-labelledby="home-title">
+        <div class="home-hero">
+            <div class="home-kicker">四川麻将 · 血战到底</div>
+            <h1 class="home-title" id="home-title">发财麻将</h1>
+            <p class="home-subtitle">三门牌、定缺开局、胡牌不散场。准备好后进入房间，牌局才会正式开始。</p>
+
+            <div class="home-rule-list" aria-label="游戏特点">
+                <span>108 张完整麻将牌</span>
+                <span>三名电脑玩家</span>
+                <span>快速对局节奏</span>
+            </div>
+
+            <button class="home-enter-btn" id="enter-room-btn" type="button">
+                <span>进入房间</span>
+                <small>进入后开始发牌与定缺</small>
+            </button>
+
+            <!-- 账号区：登录后才有金币和战绩，联机也需要用真实账号身份。 -->
+            <section class="account-panel" id="account-panel" aria-labelledby="account-panel-title">
+                <h2 class="account-panel-title" id="account-panel-title">玩家账号</h2>
+
+                <!-- 未登录时显示 -->
+                <div class="account-guest-view" id="account-guest-view">
+                    <p class="account-hint">登录后即可保存金币与战绩，重启也不会丢。</p>
+                    <div class="account-form">
+                        <label class="account-field" for="account-username">
+                            <span>昵称</span>
+                            <input id="account-username" type="text" autocomplete="username" maxlength="16" placeholder="2-16 位中文/字母/数字">
+                        </label>
+                        <label class="account-field" for="account-password">
+                            <span>密码</span>
+                            <input id="account-password" type="password" autocomplete="current-password" maxlength="64" placeholder="至少 6 位">
+                        </label>
+                    </div>
+                    <div class="account-actions">
+                        <button class="account-btn account-btn-primary" id="account-login-btn" type="button">登录</button>
+                        <button class="account-btn" id="account-register-btn" type="button">注册新账号</button>
+                        <button class="account-btn account-btn-ghost" id="account-guest-btn" type="button">游客试玩</button>
+                    </div>
+                </div>
+
+                <!-- 已登录时显示 -->
+                <div class="account-user-view" id="account-user-view" hidden>
+                    <div class="account-identity">
+                        <span class="account-name" id="account-name">—</span>
+                        <span class="account-badge" id="account-guest-badge" hidden>游客</span>
+                    </div>
+                    <div class="account-stat-row">
+                        <div class="account-stat"><span class="account-stat-label">金币</span><strong class="account-stat-value" id="account-coins">—</strong></div>
+                        <div class="account-stat"><span class="account-stat-label">对局</span><strong class="account-stat-value" id="account-games">—</strong></div>
+                        <div class="account-stat"><span class="account-stat-label">胜场</span><strong class="account-stat-value" id="account-wins">—</strong></div>
+                    </div>
+                    <div class="account-actions">
+                        <button class="account-btn" id="account-records-btn" type="button">我的战绩</button>
+                        <button class="account-btn" id="account-leaderboard-btn" type="button">排行榜</button>
+                        <button class="account-btn account-btn-ghost" id="account-logout-btn" type="button">退出登录</button>
+                    </div>
+                </div>
+
+                <p class="account-message" id="account-message" role="status" aria-live="polite"></p>
+            </section>
+
+            <label class="home-guide-option">
+                <input class="settings-toggle-input" id="home-newbie-guide-toggle" type="checkbox" data-setting="newbieGuide" checked>
+                <span class="settings-toggle-control" aria-hidden="true"></span>
+                <span>
+                    <strong>显示新手指导</strong>
+                    <small>关闭后会记住，下次进入不再自动显示</small>
+                </span>
+            </label>
+        </div>
+    </section>
+
+    <!-- Main Workspace Container -->
+    <div class="workspace-container" id="game-workspace" hidden aria-hidden="true">
+        <!-- 顶部状态栏 -->
+        <header class="terminal-header room-menu-collapsed">
+            <div class="header-left">
+                <span class="system-tag">系统状态：在线</span>
+                <span class="system-title">四川麻将全息牌桌 v1.0.4</span>
+            </div>
+            <div class="header-center">
+                <div class="quantum-core">
+                    <span class="core-label">当前方位：</span>
+                    <span class="core-val" id="sector-indicator">南家（南-01）</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- 顶栏账号信息：牌桌上随时能看到自己是谁、还有多少金币。 -->
+                <button class="account-hud" id="account-hud" type="button" title="查看战绩与排行榜">
+                    <span class="account-hud-name" id="account-hud-name">未登录</span>
+                    <span class="account-hud-coins" id="account-hud-coins">— 金币</span>
+                </button>
+                <span class="room-status" id="room-status">单机模式</span>
+                <button class="room-menu-btn" id="open-room-menu-btn" type="button" aria-expanded="false">房间</button>
+                <button class="room-create-btn" id="create-room-btn" type="button">创建联机房间</button>
+                <label class="room-join-control" for="room-number-input">
+                    <span class="sr-only">房间号</span>
+                    <input id="room-number-input" type="text" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}" placeholder="输入房间号" aria-label="六位房间号">
+                </label>
+                <button class="room-join-btn" id="join-room-btn" type="button">加入房间</button>
+                <button class="room-ready-btn" id="room-ready-btn" type="button" disabled>准备</button>
+                <button class="room-start-btn" id="room-start-btn" type="button" disabled>房主开始</button>
+                <button class="room-leave-btn" id="room-leave-btn" type="button" disabled>离开房间</button>
+                <button class="room-reconnect-btn" id="room-reconnect-btn" type="button">重新连接</button>
+                <div class="quick-chat" aria-label="快捷聊天">
+                    <button type="button" data-chat="我准备好了">准备好</button>
+                    <button type="button" data-chat="打得不错！">赞</button>
+                    <button type="button" data-chat="请稍等一下">等等</button>
+                </div>
+                <span class="time-display" id="system-time">09:48:15</span>
+                <button class="settings-icon-btn" id="open-settings-btn" type="button" aria-label="打开设置面板" title="设置">
+                    <span class="settings-icon">⚙</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="settings-panel" id="settings-panel" hidden>
+            <div class="settings-panel-header">
+                <div>
+                    <div class="settings-title">系统设置</div>
+                    <div class="settings-subtitle">当前主题：<span id="current-theme-label">科幻风格</span></div>
+                </div>
+                <button class="settings-close-btn" id="close-settings-btn" type="button" aria-label="关闭设置面板">×</button>
+            </div>
+            <div class="settings-options">
+                <label class="settings-toggle-row">
+                    <span class="settings-toggle-text">声音</span>
+                    <input class="settings-toggle-input" type="checkbox" data-setting="sound" checked>
+                    <span class="settings-toggle-control"></span>
+                </label>
+                <label class="settings-toggle-row">
+                    <span class="settings-toggle-text">背景音乐</span>
+                    <input class="settings-toggle-input" type="checkbox" data-setting="music">
+                    <span class="settings-toggle-control"></span>
+                </label>
+                <label class="settings-volume-row">
+                    <span class="settings-toggle-text">音量</span>
+                    <input class="settings-volume-input" type="range" data-setting="volume" min="0" max="1" step="0.05" value="0.35" aria-label="音量">
+                </label>
+                <label class="settings-volume-row mobile-ui-scale-row">
+                    <span class="settings-toggle-text">手机牌桌大小 <output id="mobile-ui-scale-value">100%</output></span>
+                    <input class="settings-ui-scale-input" id="mobile-ui-scale-input" type="range" min="75" max="100" step="1" value="100" aria-label="手机横屏牌桌大小">
+                </label>
+                <label class="settings-toggle-row">
+                    <span class="settings-toggle-text">音效</span>
+                    <input class="settings-toggle-input" type="checkbox" data-setting="effect" checked>
+                    <span class="settings-toggle-control"></span>
+                </label>
+                <label class="settings-toggle-row">
+                    <span class="settings-toggle-text">震动</span>
+                    <input class="settings-toggle-input" type="checkbox" data-setting="vibration" checked>
+                    <span class="settings-toggle-control"></span>
+                </label>
+                <label class="settings-toggle-row">
+                    <span class="settings-toggle-text">新手指导</span>
+                    <input class="settings-toggle-input" type="checkbox" data-setting="newbieGuide" checked>
+                    <span class="settings-toggle-control"></span>
+                </label>
+            </div>
+            <!--
+                服务器地址：线上环境已固定，默认对玩家隐藏。
+            -->
+            <div class="settings-server-row" id="settings-server-row" hidden>
+                <label class="settings-toggle-text" for="server-origin-input">服务器地址</label>
+                <input id="server-origin-input" type="url" inputmode="url" autocomplete="off" placeholder="http://192.168.1.10:3001">
+                <div class="settings-server-actions">
+                    <button class="account-btn" id="server-origin-save-btn" type="button">保存</button>
+                    <button class="account-btn account-btn-ghost" id="server-origin-reset-btn" type="button">恢复默认</button>
+                </div>
+                <small class="settings-server-hint" id="server-origin-hint">当前：读取中…</small>
+            </div>
+            <button class="theme-settings-btn" id="open-theme-modal-btn" type="button">
+                <span>主题设置</span>
+                <span class="theme-settings-value" id="theme-settings-value">科幻风格</span>
+            </button>
+        </div>
+
+        <!-- 战绩 / 排行榜弹层 -->
+        <div class="account-modal-backdrop" id="account-modal-backdrop" hidden>
+            <div class="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
+                <div class="account-modal-header">
+                    <div class="account-modal-title" id="account-modal-title">我的战绩</div>
+                    <button class="account-modal-close-btn" id="account-modal-close-btn" type="button" aria-label="关闭">×</button>
+                </div>
+                <div class="account-modal-tabs">
+                    <button class="account-modal-tab active" id="account-tab-records" type="button" data-account-tab="records">我的战绩</button>
+                    <button class="account-modal-tab" id="account-tab-leaderboard" type="button" data-account-tab="leaderboard">排行榜</button>
+                </div>
+                <div class="account-modal-body" id="account-modal-body">
+                    <p class="account-modal-empty">加载中…</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-modal-backdrop" id="theme-modal-backdrop" hidden>
+            <div class="theme-modal" role="dialog" aria-modal="true" aria-labelledby="theme-modal-title">
+                <div class="theme-modal-header">
+                    <div>
+                        <div class="theme-modal-title" id="theme-modal-title">主题设置</div>
+                        <div class="theme-modal-subtitle">选择牌桌视觉风格</div>
+                    </div>
+                    <button class="theme-modal-close-btn" id="close-theme-modal-btn" type="button" aria-label="关闭主题设置">×</button>
+                </div>
+                <div class="theme-option-list" id="theme-switcher-container">
+                    <button class="theme-toggle-btn" data-theme="sci-fi" type="button">
+                        <span class="theme-preview theme-preview-sci-fi" aria-hidden="true"></span>
+                        <span class="theme-name">科幻风格</span>
+                        <span class="theme-select-text">选择</span>
+                    </button>
+                    <button class="theme-toggle-btn" data-theme="classic" type="button">
+                        <span class="theme-preview theme-preview-classic" aria-hidden="true"></span>
+                        <span class="theme-name">国风风格</span>
+                        <span class="theme-select-text">选择</span>
+                    </button>
+                    <button class="theme-toggle-btn" data-theme="xianxia" type="button">
+                        <span class="theme-preview theme-preview-xianxia" aria-hidden="true"></span>
+                        <span class="theme-name">仙侠风格</span>
+                        <span class="theme-select-text">选择</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Display Layout -->
+        <main class="terminal-body">
+            <!-- Left Side: Interactive Table Simulator -->
+            <section class="table-simulator-section">
+                <div class="section-title-bar">
+                    <div class="title-text">全息星际牌桌</div>
+                    <div class="title-deco"></div>
+                </div>
+
+                <div class="mahjong-table-wrapper">
+                    <div class="mahjong-table">
+                        <!-- 牌桌中心核心 -->
+                        <div class="table-center-core">
+                            <div class="quantum-dice-box" id="dice-trigger">
+                                <div class="dice-digit" id="dice-val-1">5</div>
+                                <div class="dice-digit" id="dice-val-2">6</div>
+                                <div class="dice-subtext">掷骰</div>
+                            </div>
+                            <div class="wind-indicator-ring">
+                                <div class="wind-sector sector-north" data-player="north">北</div>
+                                <div class="wind-sector sector-east" data-player="east">东</div>
+                                <div class="wind-sector sector-south active" data-player="south">南</div>
+                                <div class="wind-sector sector-west" data-player="west">西</div>
+                            </div>
+                            <div class="center-stats">
+                                <div class="stat-row"><span class="lbl">剩余牌</span><span class="val" id="tiles-left">84</span></div>
+                                <div class="stat-row"><span class="lbl">奖池</span><span class="val text-cyan">32,400</span></div>
+                            </div>
+                        </div>
+                        <div class="center-border-box"></div>
+
+                        <!-- 玩家3（北家）- 对手2 -->
+                        <div class="player-area player-north" id="area-north">
+                            <div class="player-info-card" id="avatar-north" tabindex="0" aria-label="查看赛博飞鸟信息">
+                                <div class="avatar-que-badge font-share">定缺</div>
+                                <div class="avatar-frame">
+                                    <img src="" alt="玩家3头像" class="avatar-img" id="img-north">
+                                    <div class="avatar-scanline"></div>
+                                    <div class="status-overlay">已胡</div>
+                                </div>
+                                <div class="player-details">
+                                    <div class="player-name">赛博飞鸟</div>
+                                    <div class="player-balance">💎 <span class="val">18,500</span></div>
+                                    <div class="player-que-status font-share text-green">定缺：筒</div>
+                                </div>
+                            </div>
+                            <div class="opponent-hand horizontal-tiles">
+                                <!-- 背面牌 -->
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                                <div class="tile-back mini-tile"></div>
+                            </div>
+                        </div>
+
+                        <!-- 玩家4（西家）- 对手3 -->
+                        <div class="player-area player-west" id="area-west">
+                            <div class="player-info-card" id="avatar-west" tabindex="0" aria-label="查看霓虹狼信息">
+                                <div class="avatar-que-badge font-share">定缺</div>
+                                <div class="avatar-frame">
+                                    <img src="" alt="玩家4头像" class="avatar-img" id="img-west">
+                                    <div class="avatar-scanline"></div>
+                                    <div class="status-overlay">破产</div>
+                                </div>
+                                <div class="player-details">
+                                    <div class="player-name">霓虹狼</div>
+                                    <div class="player-balance">💎 <span class="val text-magenta">0</span></div>
+                                    <div class="player-que-status font-share text-magenta">定缺：筒</div>
+                                </div>
+                            </div>
+                            <div class="opponent-hand vertical-tiles">
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                            </div>
+                        </div>
+
+                        <!-- 玩家2（东家）- 对手1 -->
+                        <div class="player-area player-east" id="area-east">
+                            <div class="player-info-card" id="avatar-east" tabindex="0" aria-label="查看矩阵猫信息">
+                                <div class="avatar-que-badge font-share">定缺</div>
+                                <div class="avatar-frame">
+                                    <img src="" alt="玩家2头像" class="avatar-img" id="img-east">
+                                    <div class="avatar-scanline"></div>
+                                    <div class="status-overlay">警戒</div>
+                                </div>
+                                <div class="player-details">
+                                    <div class="player-name">矩阵猫</div>
+                                    <div class="player-balance">💎 <span class="val">42,000</span></div>
+                                    <div class="player-que-status font-share text-cyan">定缺：万</div>
+                                </div>
+                            </div>
+                            <div class="opponent-hand vertical-tiles">
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                                <div class="tile-back mini-tile vertical"></div>
+                            </div>
+                        </div>
+
+                        <!-- 牌河（中心区域） -->
+                        <div class="discard-container">
+                            <!-- 玩家打出的牌 -->
+                            <div class="discard-sub-grid grid-north"></div>
+                            <div class="discard-sub-grid grid-east"></div>
+                            <div class="discard-sub-grid grid-south" id="discard-south-pool">
+                                <!-- 初始化时渲染 -->
+                            </div>
+                            <div class="discard-sub-grid grid-west"></div>
+                        </div>
+
+                        <!-- Floating Command Overlay (碰, 杠, 胡, 听) -->
+                        <div class="action-dock" id="action-dock">
+                            <div class="action-target-tile" id="action-target-tile" hidden aria-label="目标触发牌">
+                                <span class="target-tile-badge font-share">目标牌</span>
+                                <div class="target-tile-box" id="action-target-tile-box"></div>
+                            </div>
+                            <button type="button" class="action-btn btn-peng" data-action="peng">
+                                <span class="btn-glow"></span>
+                                <span class="btn-char">碰</span>
+                                <span class="btn-sub font-share">碰牌</span>
+                            </button>
+                            <button type="button" class="action-btn btn-gang" data-action="gang">
+                                <span class="btn-glow"></span>
+                                <span class="btn-char">杠</span>
+                                <span class="btn-sub font-share">杠牌</span>
+                            </button>
+                            <button type="button" class="action-btn btn-hu" data-action="hu">
+                                <span class="btn-glow"></span>
+                                <span class="btn-char">胡</span>
+                                <span class="btn-sub font-share">胡牌</span>
+                            </button>
+                            <button type="button" class="action-btn btn-guo" data-action="guo">
+                                <span class="btn-glow"></span>
+                                <span class="btn-char">过</span>
+                                <span class="btn-sub font-share">跳过</span>
+                            </button>
+                        </div>
+                        <button type="button" class="settlement-open-btn" id="open-settlement-btn" hidden>
+                            查看本局结算
+                        </button>
+                        <div class="action-guide" id="action-guide" role="status" aria-live="polite"></div>
+
+                        <aside class="newbie-guide" id="newbie-guide" aria-label="新手引导">
+                            <button type="button" class="newbie-guide-close" id="close-newbie-guide" aria-label="关闭并不再自动显示新手引导">不再显示</button>
+                            <strong>新手三步</strong>
+                            <span>1. 先选择定缺花色。</span>
+                            <span>2. 轮到你时，点击一张手牌打出。</span>
+                            <span>3. 出现“碰、杠、胡”时，按提示选择操作。</span>
+                        </aside>
+
+                        <!-- 玩家1（南家）- 用户 -->
+                        <div class="player-area player-south" id="area-south">
+                            <!-- User Hand Tiles -->
+                            <div class="south-hand-row">
+                                <!-- 玩家信息卡片 -->
+                                <div class="player-info-card active-turn" id="avatar-south" tabindex="0" aria-label="查看你的玩家信息">
+                                    <div class="avatar-que-badge font-share">定缺</div>
+                                    <div class="avatar-frame">
+                                        <img src="" alt="玩家1头像" class="avatar-img" id="img-south">
+                                        <div class="avatar-scanline"></div>
+                                        <div class="status-overlay">行动中</div>
+                                    </div>
+                                    <div class="player-details">
+                                        <div class="player-name">你（指挥官）</div>
+                                        <div class="player-balance">💎 <span class="val" id="user-balance">50,000</span></div>
+                                        <div class="player-que-status font-share text-orange" id="user-que-display">定缺：条</div>
+                                    </div>
+                                </div>
+
+                                <div class="user-hand horizontal-tiles" id="user-hand-container">
+                                    <!-- Generated Dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Event Log Terminal (Bottom Left) -->
+                <div class="terminal-log-panel">
+                    <div class="log-header">
+                        <span class="title">战术数据日志</span>
+                        <span class="indicator blink"></span>
+                    </div>
+                    <div class="log-content font-share" id="terminal-logs">
+                        <div class="log-line text-cyan">[系统] 控制台已启动，牌桌已生成。</div>
+                        <div class="log-line text-cyan">[系统] 已载入玩法：四川麻将【血战到底】</div>
+                        <div class="log-line">[系统] 请先选择定缺花色。</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 定缺层放在牌桌缩放容器外，保证手机横屏时始终完整覆盖屏幕。 -->
+        <div class="dingque-panel" id="dingque-overlay">
+            <div class="dingque-title">请选择定缺花色</div>
+            <div class="dingque-options">
+                <button type="button" class="que-btn" data-que="wan">
+                    <span class="que-symbol">萬</span>
+                    <span class="que-desc font-share">万</span>
+                </button>
+                <button type="button" class="que-btn" data-que="tiao">
+                    <span class="que-symbol">条</span>
+                    <span class="que-desc font-share">条</span>
+                </button>
+                <button type="button" class="que-btn" data-que="tong">
+                    <span class="que-symbol">筒</span>
+                    <span class="que-desc font-share">筒</span>
+                </button>
+            </div>
+            <div class="dingque-hint text-cyan">血战到底：定缺门必须在胡牌前打完，否则无法胡牌。</div>
+        </div>
+    </div>
+
+            <!-- 中心全息提示（碰、杠、胡等） -->
+    <div class="holo-alert-overlay" id="holo-alert-screen">
+        <div class="holo-alert-ring-outer"></div>
+        <div class="holo-alert-ring-inner"></div>
+        <div class="holo-alert-content">
+            <h1 class="holo-alert-title" id="holo-alert-title">胡</h1>
+            <div class="holo-alert-line"></div>
+            <p class="holo-alert-subtitle" id="holo-alert-subtitle">目标锁定，胡牌完成</p>
+        </div>
+        <div class="holo-alert-scanline"></div>
+    </div>
+
+    <!-- Full-screen Settlement Overlay (结算界面) -->
+    <div class="settlement-overlay-screen" id="settlement-screen">
+        <div class="settlement-panel-container">
+            <div class="settlement-border-line top-line"></div>
+            <div class="settlement-border-line bottom-line"></div>
+            
+            <header class="settlement-panel-header">
+                <div class="title-main">终局结算数据链路</div>
+                <div class="title-sub font-share">游戏模式：四川麻将血战到底</div>
+                <button type="button" class="close-settlement-btn" id="close-settlement-btn">✖ 关闭面板</button>
+            </header>
+
+            <div class="settlement-players-grid">
+                <!-- User (S) Card -->
+                <div class="settlement-card rank-1">
+                    <div class="rank-tag">第1名</div>
+                    <div class="settlement-avatar-box">
+                        <img src="" alt="玩家1结算头像" class="set-avatar-img set-img-1">
+                        <div class="hologram-effect"></div>
+                    </div>
+                    <div class="settlement-player-info">
+                        <div class="name">你（指挥官）</div>
+                        <div class="status text-green font-share">胡牌阶段：第2轮，首胡</div>
+                    </div>
+                    <div class="settlement-details-list font-share">
+                        <div class="detail-item"><span>清一色</span><span class="val text-cyan">+4 番</span></div>
+                        <div class="detail-item"><span>自摸杠</span><span class="val text-cyan">+2 番</span></div>
+                        <div class="detail-item"><span>刮风下雨</span><span class="val text-cyan">+8,000 分</span></div>
+                        <div class="detail-item"><span>最终积分</span><span class="val text-green">+34,000 分</span></div>
+                    </div>
+                    <div class="total-score-box win">+34,000</div>
+                </div>
+
+                <!-- Opponent 1 (N) Card -->
+                <div class="settlement-card rank-2">
+                    <div class="rank-tag">第2名</div>
+                    <div class="settlement-avatar-box">
+                        <img src="" alt="玩家3结算头像" class="set-avatar-img set-img-2">
+                        <div class="hologram-effect"></div>
+                    </div>
+                    <div class="settlement-player-info">
+                        <div class="name">赛博飞鸟</div>
+                        <div class="status text-green font-share">胡牌阶段：第4轮，二胡</div>
+                    </div>
+                    <div class="settlement-details-list font-share">
+                        <div class="detail-item"><span>大对子</span><span class="val text-cyan">+2 番</span></div>
+                        <div class="detail-item"><span>点炮胡</span><span class="val text-cyan">+1 番</span></div>
+                        <div class="detail-item"><span>呼叫转移</span><span class="val text-magenta">-4,000 分</span></div>
+                        <div class="detail-item"><span>最终积分</span><span class="val text-cyan">+8,500 分</span></div>
+                    </div>
+                    <div class="total-score-box win">+8,500</div>
+                </div>
+
+                <!-- Opponent 2 (E) Card -->
+                <div class="settlement-card rank-3">
+                    <div class="rank-tag">第3名</div>
+                    <div class="settlement-avatar-box">
+                        <img src="" alt="玩家2结算头像" class="set-avatar-img set-img-3">
+                        <div class="hologram-effect"></div>
+                    </div>
+                    <div class="settlement-player-info">
+                        <div class="name">矩阵猫</div>
+                        <div class="status text-orange font-share">状态：存活，未胡退场</div>
+                    </div>
+                    <div class="settlement-details-list font-share">
+                        <div class="detail-item"><span>未听牌赔给有听牌</span><span class="val text-magenta">-8,000 分</span></div>
+                        <div class="detail-item"><span>刮风下雨赔偿</span><span class="val text-magenta">-2,000 分</span></div>
+                        <div class="detail-item"><span>花猪赔偿</span><span class="val text-magenta">-6,000 分</span></div>
+                        <div class="detail-item"><span>最终积分</span><span class="val text-magenta">-16,000 分</span></div>
+                    </div>
+                    <div class="total-score-box loss">-16,000</div>
+                </div>
+
+                <!-- Opponent 3 (W) Card -->
+                <div class="settlement-card rank-4">
+                    <div class="rank-tag">第4名</div>
+                    <div class="settlement-avatar-box bg-dark-red">
+                        <img src="" alt="玩家4结算头像" class="set-avatar-img set-img-4">
+                        <div class="hologram-effect"></div>
+                    </div>
+                    <div class="settlement-player-info">
+                        <div class="name">霓虹狼</div>
+                        <div class="status text-magenta font-share">状态：破产</div>
+                    </div>
+                    <div class="settlement-details-list font-share">
+                        <div class="detail-item"><span>退税</span><span class="val text-cyan">+2,000 分</span></div>
+                        <div class="detail-item"><span>被点炮</span><span class="val text-magenta">-16,000 分</span></div>
+                        <div class="detail-item"><span>极速超载惩罚</span><span class="val text-magenta">-12,500 分</span></div>
+                        <div class="detail-item"><span>最终积分</span><span class="val text-magenta">-26,500 分</span></div>
+                    </div>
+                    <div class="total-score-box loss">-26,500</div>
+                </div>
+            </div>
+
+            <footer class="settlement-panel-footer">
+                <button type="button" class="reboot-sim-btn" id="next-round-btn">新一局</button>
+                <button type="button" class="reboot-sim-btn" id="restart-round-btn">重新开始</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        /*
+         * 部署期后端地址覆盖入口。
+         * 运维可以直接编辑打包产物 dist/index.html 的这一行，不用重新构建：
+         *     window.__MAHJONG_SERVER_ORIGIN__ = 'https://mahjong.example.com';
+         * 留空则按 VITE_SERVER_ORIGIN（构建期注入）走。
+         */
+        window.__MAHJONG_SERVER_ORIGIN__ = window.__MAHJONG_SERVER_ORIGIN__ || '';
+    </script>
+    <script type="module" src="./src/app/main.js"></script>
+</body>
+</html>

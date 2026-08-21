@@ -1,0 +1,10 @@
+﻿com.huawei.appmarket
+com.huawei.filemanager
+com.huawei.gamebox
+com.huawei.hwid
+com.huawei.wallet
+com.outfit7.mytalkingangelafree.HUAWEI
+com.outfit7.mytalkingtomfree.HUAWEI
+com.tencent.jkchess
+com.tencent.qqlive
+com.xingzuodaoshi.infinityUpgrade

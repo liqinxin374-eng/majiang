@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">指尖麻将</string>
+    <string name="title_activity_main">指尖麻将</string>
+    <string name="package_name">com.zhijianmahjong.game</string>
+    <string name="custom_url_scheme">com.zhijianmahjong.game</string>
+</resources>

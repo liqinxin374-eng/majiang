@@ -1,0 +1,14 @@
+﻿=== /sdcard/DCIM ===
+61081	/sdcard/DCIM
+=== /sdcard/Download ===
+86169	/sdcard/Download
+=== /sdcard/Pictures ===
+82678	/sdcard/Pictures
+=== /sdcard/Movies ===
+7468	/sdcard/Movies
+=== /sdcard/Music ===
+164	/sdcard/Music
+=== /sdcard/Android/data ===
+30198112	/sdcard/Android/data
+=== /sdcard/Android/media ===
+36	/sdcard/Android/media

@@ -1,0 +1,17 @@
+<svg viewBox="0 0 100 135" width="1000" height="1350" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="jadeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F2FAE9" />
+      <stop offset="100%" stop-color="#E2EDE5" />
+    </linearGradient>
+  </defs>
+  <!-- 麻将牌圆角白玉底座与立体厚度 -->
+  <rect x="2" y="2" width="96" height="131" rx="7" ry="7" fill="url(#jadeGrad)" stroke="#FFFFFF" stroke-width="2" />
+  <rect x="4" y="4" width="92" height="127" rx="5" ry="5" fill="none" stroke="#DCE8E0" stroke-width="1" />
+  
+        <g class="tile-wan">
+          <text x="50" y="38" font-family="'Kaiti', 'STKaiti', '楷体', serif" font-size="64" font-weight="900" fill="#1A568C" text-anchor="middle" dominant-baseline="central">一</text>
+          <text x="50" y="93" font-family="'Kaiti', 'STKaiti', '楷体', serif" font-size="62" font-weight="900" fill="#C82829" text-anchor="middle" dominant-baseline="central">萬</text>
+        </g>
+</svg>

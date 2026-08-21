@@ -1,0 +1,3 @@
+﻿List of devices attached
+3EP7N19408007704       device product:LYA-AL00 model:LYA_AL00 device:HWLYA transport_id:2
+
