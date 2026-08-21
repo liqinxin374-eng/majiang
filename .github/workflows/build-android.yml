@@ -6,7 +6,7 @@ on:
     tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # 支持在 GitHub 网页上一键手动点击触发打包
+  workflow_dispatch:
 
 jobs:
   build-android:
@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install Node Dependencies
         run: npm install
@@ -39,8 +38,9 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
@@ -48,7 +48,7 @@ jobs:
       - name: Build Android APK with Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
