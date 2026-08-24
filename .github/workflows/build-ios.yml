@@ -46,13 +46,21 @@ jobs:
             EXPANDED_CODE_SIGN_IDENTITY="" \
             clean build 2>&1 | tee xcode-build.log
 
-      - name: Package IPA File
+      - name: Package Full IPA with Complete Game Assets
         run: |
           cd ios/App
           mkdir -p build/Payload
           cp -r build/Build/Products/Debug-iphoneos/App.app build/Payload/
+          
+          # 确保全量 8MB+ 前端资源、主题与音效完整打入 App.app/public 目录
+          mkdir -p build/Payload/App.app/public
+          cp -r App/public/* build/Payload/App.app/public/
+          
           cd build
-          zip -r facai-mahjong-ios.ipa Payload
+          zip -r -9 facai-mahjong-ios.ipa Payload
+          
+          echo "=== 打包完成，查看 IPA 文件信息 ==="
+          ls -lh facai-mahjong-ios.ipa
 
       - name: Report Error Summary on Failure
         if: failure()
@@ -65,14 +73,6 @@ jobs:
             echo "未找到 Xcode 日志文件。" >> $GITHUB_STEP_SUMMARY
           fi
           echo '```' >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload Failure Logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-error-log
-          path: ios/App/xcode-build.log
-          retention-days: 7
 
       - name: Upload iOS IPA Artifact
         if: success()
