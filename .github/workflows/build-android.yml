@@ -47,11 +47,33 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x android/gradlew
 
-      - name: Build Android APK
-        working-directory: ./android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build Android APK with Gradle
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle-build.log
+
+      - name: Report Error Summary on Failure
+        if: failure()
+        run: |
+          echo "## ❌ Android 构建失败诊断报告" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          if [ -f android/gradle-build.log ]; then
+            tail -n 80 android/gradle-build.log >> $GITHUB_STEP_SUMMARY
+          else
+            echo "未找到 Gradle 日志文件。" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Failure Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-error-log
+          path: android/gradle-build.log
+          retention-days: 7
 
       - name: Upload APK Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: facai-mahjong-android-debug-apk
@@ -59,7 +81,7 @@ jobs:
           retention-days: 30
 
       - name: Create GitHub Release (Optional for Tags)
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && success()
         uses: softprops/action-gh-release@v2
         with:
           files: android/app/build/outputs/apk/debug/app-debug.apk
