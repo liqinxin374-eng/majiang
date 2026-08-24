@@ -37,7 +37,7 @@ jobs:
           xcodebuild \
             -project App.xcodeproj \
             -scheme App \
-            -configuration Debug \
+            -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
@@ -46,18 +46,22 @@ jobs:
             EXPANDED_CODE_SIGN_IDENTITY="" \
             clean build 2>&1 | tee xcode-build.log
 
-      - name: Package Full IPA with Complete Game Assets
+      - name: Package Standard iOS IPA
         run: |
           cd ios/App
+          rm -rf build/Payload build/facai-mahjong-ios.ipa
           mkdir -p build/Payload
-          cp -r build/Build/Products/Debug-iphoneos/App.app build/Payload/
           
-          # 确保全量 8MB+ 前端资源、主题与音效完整打入 App.app/public 目录
+          # 使用 -RP 严格保留符号链接与二进制元数据
+          cp -RP build/Build/Products/Release-iphoneos/App.app build/Payload/App.app
+          
+          # 注入全量 8MB+ 前端游戏资源
           mkdir -p build/Payload/App.app/public
-          cp -r App/public/* build/Payload/App.app/public/
+          cp -RP App/public/* build/Payload/App.app/public/
           
+          # 关键：使用 zip -r -y 保留 App 内部所有 Framework 的符号链接，彻底解决爱思助手“文件已损坏”问题
           cd build
-          zip -r -9 facai-mahjong-ios.ipa Payload
+          zip -q -r -y facai-mahjong-ios.ipa Payload/
           
           echo "=== 打包完成，查看 IPA 文件信息 ==="
           ls -lh facai-mahjong-ios.ipa
