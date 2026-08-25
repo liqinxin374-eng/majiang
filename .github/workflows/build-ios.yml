@@ -37,7 +37,7 @@ jobs:
           xcodebuild \
             -project App.xcodeproj \
             -scheme App \
-            -configuration Release \
+            -configuration Debug \
             -sdk iphoneos \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
@@ -50,7 +50,7 @@ jobs:
       - name: Package Resign-Ready Unsigned iOS IPA and App Bundle
         run: |
           cd ios/App/build
-          APP_BUNDLE="Build/Products/Release-iphoneos/App.app"
+          APP_BUNDLE="Build/Products/Debug-iphoneos/App.app"
 
           rm -rf Payload facai-mahjong-ios.ipa
           rm -f App.app.zip
