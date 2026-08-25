@@ -34,6 +34,7 @@ jobs:
       - name: Build iOS Project with Xcode
         run: |
           cd ios/App
+          set -o pipefail
           xcodebuild \
             -project App.xcodeproj \
             -scheme App \
@@ -45,7 +46,28 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             EXPANDED_CODE_SIGN_IDENTITY="" \
             ONLY_ACTIVE_ARCH=NO \
-            clean build
+            clean build 2>&1 | tee xcode-build.log
+
+      - name: Report Xcode Error Summary on Failure
+        if: failure()
+        run: |
+          echo "## iOS 构建失败日志尾部" >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f ios/App/xcode-build.log ]; then
+            tail -n 120 ios/App/xcode-build.log >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "未找到 ios/App/xcode-build.log，说明失败发生在 Xcode 启动前。" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Xcode Log Artifact on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-xcode-build-log
+          path: ios/App/xcode-build.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Package Resign-Ready Unsigned iOS IPA and App Bundle
         run: |
