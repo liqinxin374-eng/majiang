@@ -46,25 +46,32 @@ jobs:
             EXPANDED_CODE_SIGN_IDENTITY="" \
             clean build 2>&1 | tee xcode-build.log
 
-      - name: Package Standard iOS IPA
+      - name: Package Standard iOS IPA with Valid CodeSignature & Assets
         run: |
           cd ios/App
           rm -rf build/Payload build/facai-mahjong-ios.ipa
           mkdir -p build/Payload
           
-          # 使用 -RP 严格保留符号链接与二进制元数据
+          # 1. 复制 App.app 并保持权限
           cp -RP build/Build/Products/Release-iphoneos/App.app build/Payload/App.app
           
-          # 注入全量 8MB+ 前端游戏资源
+          # 2. 注入 8MB+ 前端游戏资源
           mkdir -p build/Payload/App.app/public
           cp -RP App/public/* build/Payload/App.app/public/
           
-          # 关键：使用 zip -r -y 保留 App 内部所有 Framework 的符号链接，彻底解决爱思助手“文件已损坏”问题
+          # 3. 确保 Mach-O 可执行文件具备执行权限
+          chmod +x build/Payload/App.app/App
+          
+          # 4. 关键：注入 Ad-Hoc 初始签名结构，确保爱思助手/Sideloadly 解析与重签名 100% 成功
+          codesign --force --deep --sign - build/Payload/App.app
+          
+          # 5. 使用 -y 保持符号链接封包为标准 IPA
           cd build
           zip -q -r -y facai-mahjong-ios.ipa Payload/
           
-          echo "=== 打包完成，查看 IPA 文件信息 ==="
+          echo "=== 验证 IPA 文件结构 ==="
           ls -lh facai-mahjong-ios.ipa
+          codesign -dvvv Payload/App.app
 
       - name: Report Error Summary on Failure
         if: failure()
@@ -86,10 +93,14 @@ jobs:
           path: ios/App/build/facai-mahjong-ios.ipa
           retention-days: 30
 
-      - name: Create GitHub Release (Optional for Tags)
-        if: startsWith(github.ref, 'refs/tags/v') && success()
+      - name: Release Latest IPA to GitHub Releases
+        if: success() && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: latest
+          name: "指尖麻将最新版本 (iOS & Android)"
+          draft: false
+          prerelease: false
           files: ios/App/build/facai-mahjong-ios.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
