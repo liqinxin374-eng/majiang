@@ -40,11 +40,20 @@ jobs:
           cd ios/App
           set -o pipefail
           xcodebuild \
+            -resolvePackageDependencies \
+            -project App.xcodeproj \
+            -scheme App \
+            -clonedSourcePackagesDirPath build/SourcePackages \
+            2>&1 | tee xcode-resolve.log
+
+          xcodebuild \
             -project App.xcodeproj \
             -scheme App \
             -configuration Debug \
             -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath build \
+            -clonedSourcePackagesDirPath build/SourcePackages \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -57,19 +66,39 @@ jobs:
         run: |
           echo "## iOS 构建失败日志尾部" >> "$GITHUB_STEP_SUMMARY"
           echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f ios/App/xcode-resolve.log ]; then
+            echo "===== xcode-resolve.log =====" >> "$GITHUB_STEP_SUMMARY"
+            tail -n 80 ios/App/xcode-resolve.log >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ -f ios/App/xcode-build.log ]; then
+            echo "===== xcode-build.log =====" >> "$GITHUB_STEP_SUMMARY"
             tail -n 120 ios/App/xcode-build.log >> "$GITHUB_STEP_SUMMARY"
           else
             echo "未找到 ios/App/xcode-build.log，说明失败发生在 Xcode 启动前。" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
+          if [ -f ios/App/xcode-build.log ]; then
+            grep -E "error:|fatal error:|No such module|Package.swift|xcodebuild: error|BUILD FAILED" ios/App/xcode-build.log > ios/App/xcode-error-summary.txt || true
+          fi
+          if [ ! -s ios/App/xcode-error-summary.txt ] && [ -f ios/App/xcode-resolve.log ]; then
+            grep -E "error:|fatal error:|Package.swift|xcodebuild: error|failed|Failed" ios/App/xcode-resolve.log > ios/App/xcode-error-summary.txt || true
+          fi
+          if [ -s ios/App/xcode-error-summary.txt ]; then
+            while IFS= read -r line; do
+              echo "::error title=Xcode error::$line"
+            done < ios/App/xcode-error-summary.txt
+          fi
+
       - name: Upload Xcode Log Artifact on Failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: ios-xcode-build-log
-          path: ios/App/xcode-build.log
+          path: |
+            ios/App/xcode-resolve.log
+            ios/App/xcode-build.log
+            ios/App/xcode-error-summary.txt
           if-no-files-found: ignore
           retention-days: 7
 
