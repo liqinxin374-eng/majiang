@@ -8,9 +8,6 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build-ios:
     name: Build iOS IPA Package
@@ -40,69 +37,51 @@ jobs:
           xcodebuild \
             -project App.xcodeproj \
             -scheme App \
-            -configuration Release \
+            -configuration Debug \
             -sdk iphoneos \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             EXPANDED_CODE_SIGN_IDENTITY="" \
-            clean build 2>&1 | tee xcode-build.log
+            ONLY_ACTIVE_ARCH=NO \
+            clean build
 
-      - name: Package Standard iOS IPA with Valid CodeSignature & Assets
+      - name: Package Standard iOS IPA and App Bundle
         run: |
-          cd ios/App
-          rm -rf build/Payload build/facai-mahjong-ios.ipa
-          mkdir -p build/Payload
+          cd ios/App/build
+          rm -rf Payload facai-mahjong-ios.ipa
+          mkdir -p Payload
           
-          # 1. 复制 App.app 并保持权限
-          cp -RP build/Build/Products/Release-iphoneos/App.app build/Payload/App.app
+          # 1. 复制 App.app 到 Payload 目录并保持权限与符号链接
+          cp -RP Build/Products/Debug-iphoneos/App.app Payload/App.app
           
-          # 2. 注入 8MB+ 前端游戏资源
-          mkdir -p build/Payload/App.app/public
-          cp -RP App/public/* build/Payload/App.app/public/
+          # 2. 注入全量 8MB+ 前端游戏资源与音画
+          mkdir -p Payload/App.app/public
+          cp -RP ../App/public/* Payload/App.app/public/
           
-          # 3. 确保 Mach-O 可执行文件具备执行权限
-          chmod +x build/Payload/App.app/App
+          # 3. 赋予可执行文件 755 权限
+          chmod -R 755 Payload/App.app
           
-          # 4. 注入 Ad-Hoc 初始签名结构，确保爱思助手/Sideloadly 解析与重签名 100% 成功
-          codesign --force --deep --sign - build/Payload/App.app || true
+          # 4. 生成标准 IPA (顶层只有 Payload/ 文件夹)
+          zip -q -r -y facai-mahjong-ios.ipa Payload
           
-          # 5. 使用 -y 保持符号链接封包为标准 IPA
-          cd build
-          zip -q -r -y facai-mahjong-ios.ipa Payload/
+          # 5. 同时生成 App.app 纯净压缩包作为备用
+          zip -q -r -y App.app.zip Payload/App.app
           
-          echo "=== 验证 IPA 文件信息 ==="
-          ls -lh facai-mahjong-ios.ipa
-
-      - name: Report Error Summary on Failure
-        if: failure()
-        run: |
-          echo "## ❌ iOS 构建失败诊断报告" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          if [ -f ios/App/xcode-build.log ]; then
-            tail -n 80 ios/App/xcode-build.log >> $GITHUB_STEP_SUMMARY
-          else
-            echo "未找到 Xcode 日志文件。" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "=== 查看产物文件信息 ==="
+          ls -lh facai-mahjong-ios.ipa App.app.zip
 
       - name: Upload iOS IPA Artifact
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: facai-mahjong-ios-ipa
           path: ios/App/build/facai-mahjong-ios.ipa
           retention-days: 30
 
-      - name: Release Latest IPA to GitHub Releases
-        if: success() && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
+      - name: Upload App Bundle Artifact (Backup)
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: latest
-          name: "指尖麻将最新版本 (iOS & Android)"
-          draft: false
-          prerelease: false
-          files: ios/App/build/facai-mahjong-ios.ipa
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: facai-mahjong-App-bundle
+          path: ios/App/build/App.app.zip
+          retention-days: 30
