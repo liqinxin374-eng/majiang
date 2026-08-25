@@ -1,5 +1,6 @@
 import { getTileSVG as renderTileSVG } from '../tileSvg.js';
 import { initErrorLogger } from '../errorLogger.js';
+import { createTurnFlowScheduler } from '../turnFlowScheduler.js';
 import { describeServerConfig, getServerHttpUrl, getServerWsUrl, setServerOriginOverride } from '../config.js';
 import { createAccountClient } from '../accountClient.js';
 import { clearSession, loadSession, loadToken, saveSession, saveToken, updateSessionCoins } from '../sessionStore.js';
@@ -222,6 +223,8 @@ let DING_QUE_SUIT = '';
 let IS_AUTO_PLAYING = false;
 let ROUND_END_ALERT_SHOWN = false;
 let IS_WAITING_FOR_REACTION = false;
+// 所有自动回合共用一个调度器，防止安卓端重复计时任务把牌局推进两次。
+const TURN_FLOW = createTurnFlowScheduler();
 const USER_REACTION_TIMEOUT_MS = 10000;
 let USER_REACTION_TIMER = null;
 let USER_REACTION_DEADLINE = 0;
@@ -390,7 +393,7 @@ function autoPassUserReaction() {
 
         renderGameState();
         if (GAME_STATE.phase !== 'round_over') {
-            setTimeout(() => {
+            TURN_FLOW.schedule(() => {
                 runOpponentTurnsUntilUser();
             }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
         }
@@ -403,7 +406,7 @@ function autoPassUserReaction() {
     logTerminal(`[系统] 等待 10 秒超时，已自动为你选择“过”。`);
     renderGameState();
 
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         runOpponentTurnsUntilUser();
     }, AUTO_PLAY_DELAYS.afterUserPass);
 }
@@ -416,7 +419,7 @@ function continueAfterUserHu() {
 
     // 血战到底不是一人胡牌就结束：已胡玩家退出，剩余玩家继续轮流摸打。
     IS_AUTO_PLAYING = true;
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         runOpponentTurnsUntilUser();
     }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
 }
@@ -682,7 +685,7 @@ function discardTile(index) {
 
     renderGameState();
     
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         handleReactionAfterDiscard();
     }, AUTO_PLAY_DELAYS.afterDiscardBeforeReaction);
 }
@@ -943,6 +946,8 @@ function renderGameState() {
 function handleRoundOverIfNeeded() {
     if (GAME_STATE.phase !== 'round_over') return false;
 
+    // 终局后清掉尚未执行的机器人动作，避免它们污染下一局。
+    TURN_FLOW.cancel();
     logTerminal(`[系统] ${getRoundEndMessage(GAME_STATE.endReason)}`);
     triggerRoundEndAlert(GAME_STATE.endReason);
     showSettlementScreen();
@@ -1025,6 +1030,8 @@ function renderSettlementPanel() {
 }
 
 function startNewRound() {
+    // 新一局开始前先作废上一局所有延迟动作。
+    TURN_FLOW.cancel();
     clearUserReactionTimeout();
     GAME_STATE = createLocalRound();
     USER_HAND = GAME_STATE.hands.south;
@@ -1095,7 +1102,7 @@ function autoDiscardForCurrentOpponent(player) {
         renderGameState();
 
         if (handleRoundOverIfNeeded()) return;
-        setTimeout(() => {
+        TURN_FLOW.schedule(() => {
             runOpponentTurnsUntilUser();
         }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
         return;
@@ -1115,7 +1122,7 @@ function autoDiscardForCurrentOpponent(player) {
         renderGameState();
 
         if (handleRoundOverIfNeeded()) return;
-        setTimeout(() => {
+        TURN_FLOW.schedule(() => {
             autoDiscardForCurrentOpponent(player);
         }, AUTO_PLAY_DELAYS.beforeOpponentDiscard);
         return;
@@ -1128,7 +1135,7 @@ function autoDiscardForCurrentOpponent(player) {
     }
     renderGameState();
 
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         handleReactionAfterDiscard();
     }, AUTO_PLAY_DELAYS.afterDiscardBeforeReaction);
 }
@@ -1138,7 +1145,7 @@ function handleReactionAfterDiscard() {
 
     const reaction = chooseAutoReaction(GAME_STATE, PLAYER_ORDER);
     if (!reaction) {
-        setTimeout(() => {
+        TURN_FLOW.schedule(() => {
             runOpponentTurnsUntilUser();
         }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
         return;
@@ -1159,7 +1166,7 @@ function handleReactionAfterDiscard() {
 
     const autoReaction = performAutoReaction(GAME_STATE, [reaction.player]);
     if (!autoReaction) {
-        setTimeout(() => {
+        TURN_FLOW.schedule(() => {
             runOpponentTurnsUntilUser();
         }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
         return;
@@ -1174,13 +1181,13 @@ function handleReactionAfterDiscard() {
     if (handleRoundOverIfNeeded()) return;
 
     if (autoReaction.action === 'hu') {
-        setTimeout(() => {
+        TURN_FLOW.schedule(() => {
             runOpponentTurnsUntilUser();
         }, AUTO_PLAY_DELAYS.afterReactionBeforeContinue);
         return;
     }
 
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         autoDiscardForCurrentOpponent(autoReaction.player);
     }, AUTO_PLAY_DELAYS.beforeOpponentDiscard);
 }
@@ -1210,7 +1217,7 @@ function runOpponentTurnsUntilUser() {
     logTerminal(`[对手] ${getPlayerName(nextTurn.player)}摸了一张牌。`);
     playGameSound('draw');
 
-    setTimeout(() => {
+    TURN_FLOW.schedule(() => {
         autoDiscardForCurrentOpponent(nextTurn.player);
     }, AUTO_PLAY_DELAYS.beforeOpponentDiscard);
 }
@@ -1264,6 +1271,8 @@ function applyNewbieGuideVisibility() {
 function enterGameRoom() {
     if (GAME_HAS_STARTED) return;
 
+    // 进入本地牌局时建立干净的回合流程，不继承首页或旧牌局任务。
+    TURN_FLOW.cancel();
     GAME_STATE = createLocalRound();
     USER_HAND = GAME_STATE.hands.south;
     GAME_HAS_STARTED = true;
@@ -2337,7 +2346,7 @@ function bootstrapApp() {
                     IS_WAITING_FOR_REACTION = false;
                     logTerminal(`[操作] 你选择跳过当前操作机会。`);
                     renderGameState();
-                    setTimeout(() => {
+                    TURN_FLOW.schedule(() => {
                         runOpponentTurnsUntilUser();
                     }, AUTO_PLAY_DELAYS.afterUserPass);
                     return;
@@ -2394,5 +2403,4 @@ function tickSettlementScores() {
         }, duration / steps);
     });
 }
-
 
