@@ -1385,10 +1385,19 @@ function setupSettingsPanel() {
 
     refreshSettingsPanel();
 
-    roomMenuButton?.addEventListener('click', () => {
+    roomMenuButton?.addEventListener('click', (event) => {
+        event.stopPropagation();
         const isOpen = header?.classList.toggle('room-menu-open');
         header?.classList.toggle('room-menu-collapsed', !isOpen);
         roomMenuButton.setAttribute('aria-expanded', String(Boolean(isOpen)));
+    });
+
+    document.addEventListener('click', (event) => {
+        if (header?.classList.contains('room-menu-open') && !header.contains(event.target)) {
+            header.classList.remove('room-menu-open');
+            header.classList.add('room-menu-collapsed');
+            roomMenuButton?.setAttribute('aria-expanded', 'false');
+        }
     });
 
     openSettingsBtn?.addEventListener('click', event => {

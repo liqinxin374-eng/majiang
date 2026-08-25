@@ -24,57 +24,179 @@
     .terminal-header {
         position: fixed !important;
         z-index: 1100 !important;
-        top: var(--mobile-board-top, 12px) !important;
-        right: var(--mobile-board-right, 12px) !important;
-        min-height: 0 !important;
-        height: auto !important;
-        width: auto !important;
-        padding: 0 !important;
-        background: transparent !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        width: 100% !important;
+        padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left)) !important;
+        background: rgba(3, 10, 22, 0.88) !important;
         border: 0 !important;
+        border-bottom: 1px solid rgba(0, 243, 255, 0.28) !important;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.6) !important;
+        backdrop-filter: blur(8px) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
         overflow: visible !important;
-        pointer-events: none;
+        box-sizing: border-box !important;
+        pointer-events: auto !important;
     }
 
-    /* 手机对局只保留牌桌，房间与设置从该界面隐藏。 */
-    .terminal-header {
-        display: none !important;
+    .header-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
     }
 
-    .header-left,
-    .header-center,
-    .room-status,
+    .header-left .system-tag {
+        font-size: 0.6rem !important;
+        padding: 1px 5px !important;
+        border-radius: 3px !important;
+    }
+
+    .header-left .system-title {
+        font-size: 0.72rem !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        white-space: nowrap !important;
+    }
+
+    .header-center {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .header-center .quantum-core {
+        padding: 2px 8px !important;
+        font-size: 0.68rem !important;
+        background: rgba(0, 243, 255, 0.08) !important;
+        border: 1px solid rgba(0, 243, 255, 0.3) !important;
+        border-radius: 4px !important;
+        white-space: nowrap !important;
+    }
+
     .time-display {
         display: none !important;
     }
 
     .header-right {
+        display: flex !important;
         width: auto !important;
+        align-items: center !important;
         justify-content: flex-end !important;
-        gap: 8px !important;
-        pointer-events: auto;
+        gap: 6px !important;
+        pointer-events: auto !important;
+    }
+
+    .account-hud {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        min-height: 28px !important;
+        padding: 2px 7px !important;
+        border: 1px solid rgba(0, 243, 255, 0.35) !important;
+        border-radius: 4px !important;
+        background: rgba(0, 243, 255, 0.06) !important;
+        font-size: 0.66rem !important;
+        white-space: nowrap !important;
+        color: var(--text-main) !important;
+    }
+
+    .account-hud-coins {
+        color: #ffb800 !important;
+        font-weight: bold !important;
+    }
+
+    .room-status {
+        display: inline-flex !important;
+        align-items: center !important;
+        min-height: 28px !important;
+        padding: 2px 8px !important;
+        border: 1px solid rgba(0, 243, 255, 0.5) !important;
+        border-radius: 4px !important;
+        background: rgba(0, 243, 255, 0.12) !important;
+        color: #00f3ff !important;
+        font-size: 0.68rem !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        letter-spacing: 0.03em !important;
+        text-shadow: 0 0 6px rgba(0, 243, 255, 0.4) !important;
     }
 
     .room-menu-btn,
     .settings-icon-btn {
-        min-width: 48px !important;
-        min-height: 40px !important;
+        min-width: 44px !important;
+        min-height: 28px !important;
+        padding: 0 7px !important;
         border: 1px solid rgba(0, 243, 255, 0.72) !important;
+        border-radius: 4px !important;
         background: rgba(2, 18, 35, 0.94) !important;
         color: var(--cyan) !important;
         box-shadow: none !important;
+        font-size: 0.7rem !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
     }
 
-    .terminal-header.room-menu-collapsed .header-right > :not(.room-menu-btn):not(.settings-icon-btn) {
+    .settings-icon-btn {
+        min-width: 28px !important;
+        padding: 0 !important;
+        font-size: 0.85rem !important;
+    }
+
+    .terminal-header.room-menu-collapsed .header-right > :not(.account-hud):not(.room-status):not(.room-menu-btn):not(.settings-icon-btn) {
         display: none !important;
     }
 
     .terminal-header.room-menu-open .header-right {
-        top: 52px !important;
-        right: 10px !important;
-        width: min(300px, calc(100vw - 20px)) !important;
-        max-height: calc(100dvh - 62px) !important;
+        position: fixed !important;
+        z-index: 1200 !important;
+        top: 42px !important;
+        right: max(8px, env(safe-area-inset-right)) !important;
+        width: min(320px, calc(100vw - 20px)) !important;
+        max-height: calc(100dvh - 50px) !important;
+        overflow-y: auto !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding: 10px !important;
+        border: 1px solid rgba(0, 243, 255, 0.65) !important;
+        border-radius: 8px !important;
+        background: rgba(2, 12, 27, 0.98) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 16px rgba(0, 243, 255, 0.25) !important;
+        backdrop-filter: blur(12px) !important;
         justify-content: flex-start !important;
+    }
+
+    .terminal-header.room-menu-open .room-create-btn,
+    .terminal-header.room-menu-open .room-join-control,
+    .terminal-header.room-menu-open .room-join-btn,
+    .terminal-header.room-menu-open .room-ready-btn,
+    .terminal-header.room-menu-open .room-start-btn,
+    .terminal-header.room-menu-open .room-leave-btn,
+    .terminal-header.room-menu-open .room-reconnect-btn,
+    .terminal-header.room-menu-open .quick-chat {
+        display: flex !important;
+    }
+
+    .terminal-header.room-menu-open .room-join-control input {
+        width: 100px !important;
+        min-height: 32px !important;
+    }
+
+    .terminal-header.room-menu-open .room-create-btn,
+    .terminal-header.room-menu-open .room-join-btn,
+    .terminal-header.room-menu-open .room-ready-btn,
+    .terminal-header.room-menu-open .room-start-btn,
+    .terminal-header.room-menu-open .room-leave-btn,
+    .terminal-header.room-menu-open .room-reconnect-btn {
+        min-height: 32px !important;
+        padding: 0 8px !important;
     }
 
     .terminal-body,

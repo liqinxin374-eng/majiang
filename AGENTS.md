@@ -55,6 +55,15 @@
   - `last-four-must-hu-evidence-2026-07-17.png`
 - 最终回复用户时，要写明截图保存路径。
 
+## GitHub 发布与双端安装包构建铁律（强制执行）
+
+- **双端全量构建原则**：每次向 GitHub 发布提交代码（无论是推送到主分支、合并发布分支还是打发布 Tag）时，**一次提交必定同时带安卓（Android APK）和苹果（iOS IPA）两个安装包的自动化构建**，严禁单端发布，严禁遗漏任何一端。
+- **发布前资源严格同步**：提交前必须执行前端生产构建并完成双端资源同步，确保 Android 和 iOS 工程内的 Web 资源与前端产物完全一致：
+  - `npm run build`
+  - `node ./node_modules/@capacitor/cli/bin/capacitor sync android`
+  - `node ./node_modules/@capacitor/cli/bin/capacitor sync ios`
+- **CI/CD 双端门控保障**：GitHub Actions 中的 `.github/workflows/build-android.yml`（Android APK 构建）与 `.github/workflows/build-ios.yml`（iOS IPA 构建）必须保持同频触发与可用。一次提交触发后，双端工作流必须全部构建成功并上传安装包产物；若任一端构建失败，该次发布视为不合格并立即阻断。
+
 ## 汇报要求
 
 - 最终回复必须包含：
@@ -63,3 +72,4 @@
   - 测试结果是否通过。
   - 关键测试点。
   - 截图证据路径。
+
