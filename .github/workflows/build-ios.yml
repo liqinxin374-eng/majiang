@@ -37,7 +37,7 @@ jobs:
           xcodebuild \
             -project App.xcodeproj \
             -scheme App \
-            -configuration Debug \
+            -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
@@ -47,35 +47,52 @@ jobs:
             ONLY_ACTIVE_ARCH=NO \
             clean build
 
-      - name: Package Standard iOS IPA and App Bundle
+      - name: Package Resign-Ready Unsigned iOS IPA and App Bundle
         run: |
           cd ios/App/build
+          APP_BUNDLE="Build/Products/Release-iphoneos/App.app"
+
           rm -rf Payload facai-mahjong-ios.ipa
+          rm -f App.app.zip
+          test -d "$APP_BUNDLE"
           mkdir -p Payload
           
-          # 1. 复制 App.app 到 Payload 目录并保持权限与符号链接
-          cp -RP Build/Products/Debug-iphoneos/App.app Payload/App.app
-          
-          # 2. 注入全量 8MB+ 前端游戏资源与音画
-          mkdir -p Payload/App.app/public
-          cp -RP ../App/public/* Payload/App.app/public/
-          
-          # 3. 赋予可执行文件 755 权限
-          chmod -R 755 Payload/App.app
-          
-          # 4. 生成标准 IPA (顶层只有 Payload/ 文件夹)
+          # 1. 使用 ditto 复制 Xcode 产物，保留 iOS App 需要的目录结构、权限和符号链接。
+          ditto "$APP_BUNDLE" Payload/App.app
+
+          # 2. 这是给爱思助手、Sideloadly 等工具重签的未签名包，先清掉旧签名与旧描述文件。
+          find Payload/App.app -name "_CodeSignature" -type d -prune -exec rm -rf {} +
+          rm -f Payload/App.app/embedded.mobileprovision
+
+          # 3. 只给主程序可执行权限，不把图片、网页资源全部改成可执行文件。
+          chmod 755 Payload/App.app/App
+
+          # 4. 打包前做基础校验，避免上传结构不完整的 IPA。
+          plutil -lint Payload/App.app/Info.plist
+          test -f Payload/App.app/App
+          test -d Payload/App.app/public
+          test -f Payload/App.app/public/index.html
+
+          # 5. 生成标准 IPA，顶层必须只有 Payload/ 文件夹。
           zip -q -r -y facai-mahjong-ios.ipa Payload
-          
-          # 5. 同时生成 App.app 纯净压缩包作为备用
-          zip -q -r -y App.app.zip Payload/App.app
-          
+
+          # 6. 校验 zip 容器和关键文件路径，提前发现“包损坏”类问题。
+          unzip -t -q facai-mahjong-ios.ipa
+          unzip -l facai-mahjong-ios.ipa | grep -q "Payload/App.app/Info.plist"
+          unzip -l facai-mahjong-ios.ipa | grep -q "Payload/App.app/App"
+          unzip -l facai-mahjong-ios.ipa | grep -q "Payload/App.app/public/index.html"
+
+          # 7. 同时生成 App.app 纯净压缩包作为备用，解压后顶层就是 App.app。
+          ditto -c -k --sequesterRsrc --keepParent Payload/App.app App.app.zip
+
           echo "=== 查看产物文件信息 ==="
           ls -lh facai-mahjong-ios.ipa App.app.zip
+          echo "注意：从 GitHub Actions 下载 Artifact 后，要先解压外层 zip，再把里面的 facai-mahjong-ios.ipa 拿去重签。" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload iOS IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: facai-mahjong-ios-ipa
+          name: unzip-first-then-sign-facai-mahjong-ios-ipa
           path: ios/App/build/facai-mahjong-ios.ipa
           retention-days: 30
 
