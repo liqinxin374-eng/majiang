@@ -34,6 +34,7 @@ jobs:
       - name: Normalize iOS Swift Package Paths
         run: |
           sed -i '' 's#\\#/#g' ios/App/CapApp-SPM/Package.swift
+          sed -i '' 's#capacitor-swift-pm.git", exact: "8.4.2"#capacitor-swift-pm.git", exact: "8.0.2"#g' ios/App/CapApp-SPM/Package.swift
 
       - name: Build iOS Project with Xcode
         run: |
